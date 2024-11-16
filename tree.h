@@ -16,7 +16,7 @@
 // Datatype of Keys
 typedef uint32_t bkey_t;
 // Datatype of Values
-typedef uint32_t bval_t;
+typedef int32_t bval_t;
 // Datatype of pointers within the tree
 typedef uint32_t bptr_t;
 // Leaf index type

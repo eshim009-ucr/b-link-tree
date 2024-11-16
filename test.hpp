@@ -65,4 +65,47 @@ TEST(InsertTest, SplitRoot) {
 	dump_node_list(log_stream, &tree);
 	EXPECT_EQ(insert(&tree, 4, -4), SUCCESS);
 	dump_node_list(log_stream, &tree);
+	
+	EXPECT_EQ(tree.leaves[0].keys[0], 0);
+	EXPECT_EQ(tree.leaves[0].keys[1], 1);
+	EXPECT_EQ(tree.leaves[0].keys[2], 3);
+	EXPECT_EQ(tree.leaves[1].keys[0], 4);
+	EXPECT_EQ(tree.leaves[1].keys[1], 5);
+	
+	EXPECT_EQ(tree.leaves[0].data[0], 0);
+	EXPECT_EQ(tree.leaves[0].data[1], -1);
+	EXPECT_EQ(tree.leaves[0].data[2], -3);
+	EXPECT_EQ(tree.leaves[1].data[0], -4);
+	EXPECT_EQ(tree.leaves[1].data[1], -5);
+	
+	EXPECT_EQ(tree.root, MAX_LEAVES);
+	EXPECT_FALSE(root_is_leaf(&tree));
+	EXPECT_EQ(tree.memory[tree.root].inner.keys[0], 3);
+	EXPECT_EQ(tree.memory[tree.root].inner.keys[1], 5);
+	EXPECT_EQ(tree.memory[tree.root].inner.children[0], 0);
+	EXPECT_EQ(tree.memory[tree.root].inner.children[1], 1);
+}
+
+TEST(InsertTest, TwoLevel) {
+	const testing::TestInfo* const test_info
+		= testing::UnitTest::GetInstance()->current_test_info();
+	fprintf(log_stream, "=== %s.%s ===\n",
+		test_info->test_suite_name(), test_info->name()
+	);
+
+	Tree tree;
+	init_tree(&tree);
+
+	EXPECT_EQ(insert(&tree, 0, 0), SUCCESS);
+	dump_node_list(log_stream, &tree);
+	EXPECT_EQ(insert(&tree, 5, -5), SUCCESS);
+	dump_node_list(log_stream, &tree);
+	EXPECT_EQ(insert(&tree, 3, -3), SUCCESS);
+	dump_node_list(log_stream, &tree);
+	EXPECT_EQ(insert(&tree, 1, -1), SUCCESS);
+	dump_node_list(log_stream, &tree);
+	EXPECT_EQ(insert(&tree, 4, -4), SUCCESS);
+	dump_node_list(log_stream, &tree);
+	EXPECT_EQ(insert(&tree, 6, -6), SUCCESS);
+	dump_node_list(log_stream, &tree);
 }
