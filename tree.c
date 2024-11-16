@@ -4,16 +4,6 @@
 
 #define DIV2CEIL(x) (((x) & 1) ? (((x)/2) + 1) : ((x)/2))
 
-inline static ErrorCode search_leaf(LeafNode *leaf, bkey_t key, li_t *index) {
-	for (li_t i = 0; i < MAX_KEYS; ++i) {
-		if (leaf->keys[i] == key) {
-			if (index != NULL) *index = i;
-			return SUCCESS;
-		}
-	}
-	return NOT_FOUND;
-}
-
 // Assumes first key is valid
 static bptr_t search_inner(InnerNode *node, bkey_t key, ErrorCode *status) {
 	for (li_t i = 0; i < MAX_KEYS; ++i) {
@@ -27,23 +17,20 @@ static bptr_t search_inner(InnerNode *node, bkey_t key, ErrorCode *status) {
 	return INVALID;
 }
 
-ErrorCode search(Tree *tree, bkey_t key, InnerNode *parent) {
+ErrorCode search(Tree *tree, bkey_t key, bptr_t *lineage) {
 	ErrorCode status;
-	parent = &get_root(tree)->inner;
-	Node *child;
+	lineage[0] = tree->root;
 	// If root is a leaf node
-	if (parent->keys[0] == INVALID) {
-		return search_leaf(&get_root(tree)->leaf, key, NULL);
+	if (root_is_leaf(tree)) {
+		return SUCCESS;
 	}
 	// Root is an inner node
-	for (li_t i = 0; i < MAX_LEVELS; ++i) {
-		child = &tree->memory[search_inner(parent, key, &status)];
+	for (li_t i = 1; i < MAX_LEVELS; ++i) {
+		lineage[i] = search_inner(&tree->memory[lineage[i-1]].inner, key, &status);
 		if (status != SUCCESS) {
 			return status;
-		} else if (is_leaf(tree, child)) {
-			return search_leaf(&get_root(tree)->leaf, key, NULL);
-		} else {
-			parent = &child->inner;
+		} else if (bptr_is_leaf(tree, lineage[i])) {
+			return SUCCESS;
 		}
 	}
 	return NOT_FOUND;
@@ -152,6 +139,32 @@ ErrorCode insert(Tree *tree, bkey_t key, bval_t value) {
 	if (root_is_leaf(tree)) {
 		return insert_at_leaf(tree, tree->root, NULL, key, value);
 	} else {
+		bptr_t lineage[MAX_LEVELS];
+		memset(lineage, INVALID, sizeof(lineage));
+		search(tree, key, lineage);
+		// Adjust parents if new max
+		for (int i = 0; i < MAX_LEVELS; ++i) {
+			if (lineage[i] == INVALID) {
+				printf("---, ");
+			} else {
+				printf("%u, ", lineage[i]);
+			}
+		}
+		printf("\n");
+		// Adjust parent high keys if new max
+		li_t i_max;
+		for (int i = 0; i < MAX_LEVELS; ++i) {
+			if (bptr_is_leaf(tree, lineage[i])) {
+				break;
+			}
+			i_max = max(&tree->memory[lineage[i]]);
+			if (key <= i_max) {
+				break;
+			} else {
+				tree->memory[lineage[i]].inner.keys[i_max] = key;
+			}
+		}
+
 		return NOT_IMPLEMENTED;
 	}
 }

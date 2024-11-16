@@ -66,3 +66,27 @@ TEST(InsertTest, SplitRoot) {
 	EXPECT_EQ(insert(&tree, 4, -4), SUCCESS);
 	dump_node_list(log_stream, &tree);
 }
+
+TEST(InsertTest, OneInternal) {
+	const testing::TestInfo* const test_info
+		= testing::UnitTest::GetInstance()->current_test_info();
+	fprintf(log_stream, "=== %s.%s ===\n",
+		test_info->test_suite_name(), test_info->name()
+	);
+
+	Tree tree;
+	init_tree(&tree);
+
+	EXPECT_EQ(insert(&tree, 0, 0), SUCCESS);
+	dump_node_list(log_stream, &tree);
+	EXPECT_EQ(insert(&tree, 6, -6), SUCCESS);
+	dump_node_list(log_stream, &tree);
+	EXPECT_EQ(insert(&tree, 3, -3), SUCCESS);
+	dump_node_list(log_stream, &tree);
+	EXPECT_EQ(insert(&tree, 1, -1), SUCCESS);
+	dump_node_list(log_stream, &tree);
+	EXPECT_EQ(insert(&tree, 4, -4), SUCCESS);
+	dump_node_list(log_stream, &tree);
+	EXPECT_EQ(insert(&tree, 5, -5), SUCCESS);
+	dump_node_list(log_stream, &tree);
+}

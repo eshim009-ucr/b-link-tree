@@ -77,11 +77,22 @@ static inline bool is_leaf(Tree *tree, Node *node) {
 	// Assume leaves are stored at lowest memory addresses
 	return (void*) node < (void*) tree->inners;
 }
+static inline bool bptr_is_leaf(Tree *tree, bptr_t node) {
+	// Assume leaves are stored at lowest memory addresses
+	return node < MAX_NODES_PER_LEVEL;
+}
 static inline Node* get_root(Tree *tree) {
 	return &tree->memory[tree->root];
 }
 static inline bool root_is_leaf(Tree *tree) {
 	return tree->root < MAX_LEAVES;
+}
+static inline li_t max(Node *node) {
+	li_t i;
+	for (i = MAX_CHILDREN-1; i > 0; i--) {
+		if (node->inner.keys[i] != INVALID) break;
+	}
+	return i;
 }
 static inline void init_node(Node *node) {
 	memset(node->inner.keys, INVALID, sizeof(node->inner.keys));
@@ -94,6 +105,7 @@ static inline void init_tree(Tree *tree) {
 void print_tree(FILE *stream, Tree *tree);
 void dump_node_list(FILE *stream, Tree *tree);
 
+ErrorCode search(Tree *tree, bkey_t key, bptr_t *lineage);
 ErrorCode insert(Tree *tree, bkey_t key, bval_t value);
 
 #endif
