@@ -1,6 +1,6 @@
 SRC=$(wildcard *.c)
 OBJ=$(subst .c,.o,$(SRC)) main.o
-CFLAGS=-Wall
+CFLAGS=-Wall -g
 LDLIBS=-lgtest
 
 

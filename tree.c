@@ -49,6 +49,10 @@ ErrorCode search(Tree *tree, bkey_t key, InnerNode *parent) {
 	return NOT_FOUND;
 }
 
+ErrorCode insert_at_inner(Tree *tree, LeafNode *leaf, bkey_t key, bval_t value) {
+	return NOT_IMPLEMENTED;
+}
+
 bptr_t insert_at_leaf_nonfull(Tree *tree, bptr_t leaf_addr, bkey_t key, bval_t value, ErrorCode *status) {
 	li_t i_insert = 0;
 	LeafNode *leaf = &tree->memory[leaf_addr].leaf;
@@ -144,14 +148,61 @@ ErrorCode insert_at_leaf(Tree *tree, bptr_t leaf_addr, InnerNode *parent, bkey_t
 			leaf_addr = new_leaf;
 		} // Else, leaf_addr stays the same
 	} while(true);
+	// Leaf must be split
+	// printf("Splitting leaf\n");
+	// split_leaf(tree, leaf, new_leaf);
+
+	// li_t i_old = MAX_CHILDREN-1;
+	// li_t i_new = (MAX_CHILDREN+1) / 2;
+	// bool inserted = false;
+	// // Scoot nodes if necessary to maintain ordering
+	// while (true) {
+	// 	// If new data goes in current slot of new node
+	// 	if (i_new == i_insert) {
+	// 		new_leaf->keys[i_new] = key;
+	// 		new_leaf->data[i_new] = value;
+	// 		inserted = true;
+	// 	} else {
+	// 		new_leaf->keys[i_new] = leaf->keys[i_old];
+	// 		new_leaf->data[i_new] = leaf->data[i_old];
+	// 		// Keep i_old stuf at FFFF when it's not needed anymore
+	// 		if (i_old != INVALID) {
+	// 			i_old--;
+	// 			i_new--;
+	// 		}
+	// 	}
+	// };
+	// // Do the actual insertion
+	// leaf->keys[i_insert] = key;
+	// leaf->data[i_insert] = value;
+
+	// for (li_t i = i_old_max; i < MAX_CHILDREN+1; ++i) {
+	// 	new_leaf->keys[i_new] = leaf->keys[i_old];
+	// 	new_leaf->data[i] = leaf->data[i + i_old_max];
+	// 	leaf->keys[i + i_old_max] = INVALID;
+	// 	leaf->data[i + i_old_max] = INVALID;
+	// }
+	// memcpy(new_leaf->keys, &leaf->keys[i_old_max], MAX_KEYS/2);
+	// memcpy(new_leaf->data, &leaf->data[i_old_max], MAX_KEYS/2);
+	// dump_keys(leaf);
+	// dump_keys(new_leaf);
+	// printf("\n");
+	// dump_leaf(leaf);
+	// dump_leaf(new_leaf);
+	// printf("\n");
+
 
 	return NOT_IMPLEMENTED;
 }
 
 ErrorCode insert(Tree *tree, bkey_t key, bval_t value) {
 	if (root_is_leaf(tree)) {
+		printf("Inserting at leaf!\n");
 		return insert_at_leaf(tree, tree->root, NULL, key, value);
 	} else {
+		printf("Inserting at inner node!\n");
+		InnerNode parent;
+		search(tree, key, &parent);
 		return NOT_IMPLEMENTED;
 	}
 }

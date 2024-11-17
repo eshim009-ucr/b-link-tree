@@ -26,20 +26,24 @@ TEST(InsertTest, LeafNode) {
 	Tree tree;
 	LeafNode *leaf = &tree.leaves[0];
 	init_tree(&tree);
+	print_tree(&tree);
 
 	EXPECT_EQ(insert(&tree, 0, 2), SUCCESS);
 	EXPECT_EQ(leaf->keys[0], 0);
 	EXPECT_EQ(leaf->data[0], 2);
+	print_tree(&tree);
 
 	EXPECT_EQ(insert(&tree, 5, 3), SUCCESS);
 	EXPECT_EQ(leaf->keys[1], 5);
 	EXPECT_EQ(leaf->data[1], 3);
+	print_tree(&tree);
 
 	EXPECT_EQ(insert(&tree, 3, 1), SUCCESS);
 	EXPECT_EQ(leaf->keys[1], 3);
 	EXPECT_EQ(leaf->data[1], 1);
 	EXPECT_EQ(leaf->keys[2], 5);
 	EXPECT_EQ(leaf->data[2], 3);
+	print_tree(&tree);
 }
 
 TEST(InsertTest, SplitRoot) {
@@ -55,5 +59,7 @@ TEST(InsertTest, SplitRoot) {
 	EXPECT_EQ(insert(&tree, 1, -1), SUCCESS);
 	dump_node_list(&tree);
 	EXPECT_EQ(insert(&tree, 4, -4), SUCCESS);
+	dump_node_list(&tree);
+	EXPECT_EQ(insert(&tree, 6, -6), SUCCESS);
 	dump_node_list(&tree);
 }
