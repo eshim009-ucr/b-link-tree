@@ -1,9 +1,7 @@
-#ifndef MEMORY_H
-#define MEMORY_H
-
-
 #include "types.h"
 #include <stddef.h>
+
+#pragma once
 
 typedef struct Node Node;
 typedef struct AddrNode AddrNode;
@@ -30,7 +28,4 @@ void mem_unlock(bptr_t address);
 //! All data is 1s except for locks
 void mem_reset_all();
 
-extern bptr_t ptr_to_addr(void *ptr);
-
-
-#endif
+bptr_t ptr_to_addr(void *ptr);

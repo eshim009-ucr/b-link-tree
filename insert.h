@@ -1,7 +1,6 @@
-#ifndef INSERT_H
-#define INSERT_H
-
 #include "types.h"
+
+#pragma once
 
 //! @brief Insert a new value into the tree with the given key and value
 //! @param[inout] root   The address of the root of the tree to insert into
@@ -10,5 +9,3 @@
 //! @return An error code representing the success or type of failure of the
 //!         operation
 ErrorCode insert(bptr_t *root, bkey_t key, bval_t value);
-
-#endif

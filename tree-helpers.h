@@ -1,9 +1,7 @@
-#ifndef TREE_HELPERS_H
-#define TREE_HELPERS_H
-
-
 #include "types.h"
 #include <stdbool.h>
+
+#pragma once
 
 
 //! @brief Get the index of a leaf in a lineage array
@@ -26,6 +24,3 @@ inline static uint_fast8_t get_leaf_idx(bptr_t const *lineage) {
 //! @return An error code representing the success or type of failure of the
 //!         operation
 ErrorCode trace_lineage(bptr_t root, bkey_t key, bptr_t *lineage);
-
-
-#endif

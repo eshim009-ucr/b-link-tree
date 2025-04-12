@@ -1,8 +1,7 @@
-#ifndef INSERT_HELPERS_H
-#define INSERT_HELPERS_H
-
-
 #include "types.h"
+
+#pragma once
+
 typedef struct Node Node;
 typedef struct AddrNode AddrNode;
 
@@ -42,5 +41,3 @@ ErrorCode insert_after_split(
 //! @return An error code representing the success or type of failure of the
 //!         operation
 ErrorCode rekey(Node *node, bkey_t old_key, bkey_t new_key);
-
-#endif

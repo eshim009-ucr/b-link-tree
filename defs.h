@@ -1,5 +1,5 @@
-#ifndef DEFS_H
-#define DEFS_H
+
+#pragma once
 
 //! Number of children in each node of a tree
 #define TREE_ORDER (4)
@@ -12,5 +12,3 @@
 #define MAX_LEAVES MAX_NODES_PER_LEVEL
 //! Maximum number of nodes that can be stored in a tree's memory
 #define MEM_SIZE (MAX_NODES_PER_LEVEL * MAX_LEVELS)
-
-#endif

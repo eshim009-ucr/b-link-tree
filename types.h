@@ -1,9 +1,7 @@
-#ifndef PRIMITIVES_H
-#define PRIMITIVES_H
-
-
 #include "defs.h"
 #include <stdint.h>
+
+#pragma once
 
 
 //! Datatype of keys
@@ -54,5 +52,3 @@ typedef struct {
 } bstatusval_t;
 
 #define INVALID ((bkey_t) -1)
-
-#endif

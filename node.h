@@ -1,8 +1,8 @@
-#ifndef NODE_H
-#define NODE_H
-
 #include "types.h"
 #include "lock.h"
+
+#pragma once
+
 
 //! @brief A generic node within the tree
 //!
@@ -70,6 +70,3 @@ inline static bool is_leaf(bptr_t addr) {
 inline static bptr_t get_level(bptr_t node_ptr) {
 	return (node_ptr / MAX_NODES_PER_LEVEL);
 }
-
-
-#endif

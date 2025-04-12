@@ -1,8 +1,7 @@
-#ifndef SPLIT_H
-#define SPLIT_H
-
-
 #include "types.h"
+
+#pragma once
+
 typedef struct AddrNode AddrNode;
 
 
@@ -19,6 +18,3 @@ ErrorCode split_node(
 	//! [out] The contents of the split node's new sibling
 	AddrNode *sibling
 );
-
-
-#endif

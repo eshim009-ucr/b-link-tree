@@ -1,7 +1,6 @@
-#ifndef LOCK_H
-#define LOCK_H
 #include <assert.h>
 
+#pragma once
 
 #define CSIM
 #if defined(CSIM)
@@ -73,5 +72,3 @@ static inline void lock_v(lock_t *lock) {
 	atomic_flag_clear(lock);
 #endif
 }
-
-#endif
