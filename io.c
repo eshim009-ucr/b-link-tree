@@ -1,7 +1,7 @@
 #include "io.h"
-#include "memory.h"
-#include "lock.h"
-#include "node.h"
+#include "core/memory.h"
+#include "core/lock.h"
+#include "core/node.h"
 #include <stdio.h>
 
 

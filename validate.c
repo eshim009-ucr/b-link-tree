@@ -1,7 +1,7 @@
 #include "validate.h"
-#include "tree-helpers.h"
-#include "memory.h"
-#include "node.h"
+#include "core/tree-helpers.h"
+#include "core/memory.h"
+#include "core/node.h"
 
 
 static li_t num_children(bptr_t node) {

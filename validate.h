@@ -1,7 +1,7 @@
 #ifndef VALIDATE_H
 #define VALIDATE_H
 
-#include "types.h"
+#include "core/types.h"
 #include <stdbool.h>
 #include <stdio.h>
 

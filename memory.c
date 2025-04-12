@@ -1,7 +1,7 @@
 #ifndef __SYNTHESIS__
-#include "lock.h"
-#include "memory.h"
-#include "node.h"
+#include "core/lock.h"
+#include "core/memory.h"
+#include "core/node.h"
 #include <string.h>
 #include <assert.h>
 

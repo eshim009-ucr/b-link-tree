@@ -1,7 +1,7 @@
 #ifndef IO_H
 #define IO_H
 
-#include "types.h"
+#include "core/types.h"
 #include <stdio.h>
 
 //! @brief Print the contents of a tree's memory in a human-readable format

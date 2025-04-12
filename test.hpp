@@ -2,12 +2,12 @@
 #include <cstdio>
 
 extern "C" {
-#include "node.h"
-#include "insert.h"
-#include "search.h"
+#include "core/node.h"
+#include "core/insert.h"
+#include "core/search.h"
 #include "validate.h"
 #include "io.h"
-#include "memory.h"
+#include "core/memory.h"
 };
 
 FILE *log_stream = fopen("log.txt", "w");

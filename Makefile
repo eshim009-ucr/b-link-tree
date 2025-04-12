@@ -1,4 +1,4 @@
-SRC=$(wildcard *.c)
+SRC=$(wildcard *.c) $(wildcard core/*.c)
 OBJ=$(subst .c,.o,$(SRC)) main.o
 CFLAGS=-Wall -std=c11
 CXXFLAGS=-Wall -std=c++14
@@ -7,8 +7,8 @@ LDLIBS=-lgtest
 
 all: test
 
-tree.o: tree.c types.h defs.h
-io.o: io.c types.h defs.h
+tree.o: tree.c core/types.h core/defs.h
+io.o: io.c core/types.h core/defs.h
 %.o: %.c
 	$(CC) -c $(CFLAGS) -o $@ $<
 
