@@ -8,24 +8,24 @@
 static Node memory[MEM_SIZE];
 
 
-Node mem_read(bptr_t address) {
+Node mem_read(bptr_t address, mread_req_stream_t *req_stream, mread_resp_stream_t *resp_stream) {
 	assert(address < MEM_SIZE);
 	return memory[address];
 }
 
-Node mem_read_lock(bptr_t address) {
+Node mem_read_lock(bptr_t address, mread_req_stream_t *req_stream, mread_resp_stream_t *resp_stream) {
 	assert(address < MEM_SIZE);
 	lock_p(&memory[address].lock);
-	return mem_read(address);
+	return mem_read(address, req_stream, resp_stream);
 }
 
-void mem_write_unlock(AddrNode *node) {
+void mem_write_unlock(AddrNode *node, mwrite_stream_t *req_stream) {
 	assert(node->addr < MEM_SIZE);
 	lock_v(&node->node.lock);
 	memory[node->addr] = node->node;
 }
 
-void mem_unlock(bptr_t address) {
+void mem_unlock(bptr_t address, mwrite_stream_t *req_stream) {
 	assert(address < MEM_SIZE);
 	lock_v(&memory[address].lock);
 }

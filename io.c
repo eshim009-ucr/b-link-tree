@@ -62,12 +62,12 @@ void dump_node_list(FILE *stream, bptr_t root) {
 	uint_fast16_t i, r, c;
 	fprintf(stream, "LEAVES\n%2u ", 0);
 	for (i = 0; i < MAX_LEAVES; ++i) {
-		n = mem_read(i);
+		n = mem_read(i, NULL, NULL);
 		dump_keys(stream, &n);
 	}
 	fprintf(stream, "\n   ");
 	for (i = 0; i < MAX_LEAVES; ++i) {
-		n = mem_read(i);
+		n = mem_read(i, NULL, NULL);
 		dump_values(stream, &n);
 	}
 	fprintf(stream, "\n");
@@ -75,12 +75,12 @@ void dump_node_list(FILE *stream, bptr_t root) {
 	for (r = 1; r < (MAX_LEVELS-1); ++r) {
 		fprintf(stream, "%2lu ", r*MAX_NODES_PER_LEVEL);
 		for (c = 0; c < MAX_NODES_PER_LEVEL; ++c) {
-			n = mem_read(r*MAX_NODES_PER_LEVEL + c);
+			n = mem_read(r*MAX_NODES_PER_LEVEL + c, NULL, NULL);
 			dump_keys(stream, &n);
 		}
 		fprintf(stream, "\n   ");
 		for (c = 0; c < MAX_NODES_PER_LEVEL; ++c) {
-			n = mem_read(r*MAX_NODES_PER_LEVEL + c);
+			n = mem_read(r*MAX_NODES_PER_LEVEL + c, NULL, NULL);
 			dump_values(stream, &n);
 		}
 		fprintf(stream, "\n");

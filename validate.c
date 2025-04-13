@@ -6,7 +6,7 @@
 
 static li_t num_children(bptr_t node) {
 	for (li_t i = 0; i < TREE_ORDER; ++i) {
-		if (mem_read(node).keys[i] == INVALID)
+		if (mem_read(node, NULL, NULL).keys[i] == INVALID)
 			return i;
 	}
 	return TREE_ORDER;
@@ -64,17 +64,17 @@ static bool validate_children(bptr_t root, bptr_t node, FILE *stream) {
 		fprintf(stream, "Validating mem[%u]'s children...\n", node);
 		for (li_t i = 0; i < TREE_ORDER; ++i) {
 			fprintf(stream, "Validating child %u, ", i);
-			if (mem_read(node).keys[i] == INVALID) {
+			if (mem_read(node, NULL, NULL).keys[i] == INVALID) {
 				fprintf(stream, "out of children\n");
 				break;
-			} else if (mem_read(node).values[i].ptr >= MEM_SIZE) {
+			} else if (mem_read(node, NULL, NULL).values[i].ptr >= MEM_SIZE) {
 				fprintf(stream,
 					"invalid, address %u >= %u\n",
-					mem_read(node).values[i].ptr, MEM_SIZE
+					mem_read(node, NULL, NULL).values[i].ptr, MEM_SIZE
 				);
 				result = false;
 			} else if (!validate_children(
-					root, mem_read(node).values[i].ptr, stream
+					root, mem_read(node, NULL, NULL).values[i].ptr, stream
 				)) {
 				result = false;
 			}
@@ -92,7 +92,7 @@ bool validate(bptr_t root, FILE *stream) {
 //! @return `true` if `node` and all of its children are unlocked,
 //!         `false` otherwise
 static bool subtree_unlocked(bptr_t node, FILE *stream) {
-	Node n = mem_read(node);
+	Node n = mem_read(node, NULL, NULL);
 	bool result = !lock_test(&n.lock);
 
 	fprintf(stream, "Checking mem[%u]'s children...\n", node);
