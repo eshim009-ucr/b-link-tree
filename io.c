@@ -1,6 +1,6 @@
 #include "io.h"
-#include "core/memory.h"
 #include "core/lock.h"
+#include "core/memory.h"
 #include "core/node.h"
 #include <stdio.h>
 
@@ -55,6 +55,7 @@ void dump_values(FILE *stream, Node const *node) {
 	}
 	fprintf(stream, "} ");
 }
+
 
 void dump_node_list(FILE *stream, bptr_t root) {
 	Node n;
