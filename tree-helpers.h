@@ -4,6 +4,8 @@
 
 #include "types.h"
 
+typedef struct Node Node;
+
 
 //! @brief Get the index of a leaf in a lineage array
 //! @param[in] lineage  An existing array of a node's parents up until the root
@@ -24,7 +26,7 @@ inline static uint_fast8_t get_leaf_idx(bptr_t const *lineage) {
 //!                      large enough to accommodate a tree of maximum height.
 //! @return An error code representing the success or type of failure of the
 //!         operation
-ErrorCode trace_lineage(bptr_t root, bkey_t key, bptr_t *lineage);
+ErrorCode trace_lineage(bptr_t root, bkey_t key, bptr_t *lineage, Node const *memory);
 
 
 #endif

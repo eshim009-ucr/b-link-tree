@@ -4,9 +4,9 @@
 #include "tree-helpers.h"
 
 
-static li_t num_children(bptr_t node) {
+static li_t num_children(bptr_t node, Node const *memory) {
 	for (li_t i = 0; i < TREE_ORDER; ++i) {
-		if (mem_read(node).keys[i] == INVALID)
+		if (mem_read(node, memory).keys[i] == INVALID)
 			return i;
 	}
 	return TREE_ORDER;
@@ -14,8 +14,8 @@ static li_t num_children(bptr_t node) {
 
 
 //! @return `true` for passing, `false` for failing
-static bool validate_root(bptr_t root, FILE *stream) {
-	li_t n_child = num_children(root);
+static bool validate_root(bptr_t root, FILE *stream, Node const *memory) {
+	li_t n_child = num_children(root, memory);
 	bool result = is_leaf(root) || n_child >= 2;
 	fprintf(stream, "Validating mem[%u] (root)...", root);
 	if (result) {
@@ -31,16 +31,16 @@ static bool validate_root(bptr_t root, FILE *stream) {
 }
 
 //! @return `true` for passing, `false` for failing
-static bool validate_node(bptr_t root, bptr_t node, FILE *stream) {
+static bool validate_node(bptr_t root, bptr_t node, FILE *stream, Node const *memory) {
 	if (node == root) {
-		return validate_root(root, stream);
+		return validate_root(root, stream, memory);
 	} else {
 		fprintf(stream, "mem[%u]...", node);
 		if (node >= MEM_SIZE) {
 			fprintf(stream, "invalid, address %u >= %u\n", node, MEM_SIZE);
 			return false;
 		}
-		li_t n_child = num_children(node);
+		li_t n_child = num_children(node, memory);
 		bool result = is_leaf(node) || n_child >= TREE_ORDER / 2;
 		if (result) {
 			fprintf(stream, "valid!\n");
@@ -55,26 +55,26 @@ static bool validate_node(bptr_t root, bptr_t node, FILE *stream) {
 	}
 }
 
-static bool validate_children(bptr_t root, bptr_t node, FILE *stream) {
+static bool validate_children(bptr_t root, bptr_t node, FILE *stream, Node const *memory) {
 	bool result = true;
-	if (!validate_node(root, node, stream)) {
+	if (!validate_node(root, node, stream, memory)) {
 		result = false;
 	}
 	if (!is_leaf(node)) {
 		fprintf(stream, "Validating mem[%u]'s children...\n", node);
 		for (li_t i = 0; i < TREE_ORDER; ++i) {
 			fprintf(stream, "Validating child %u, ", i);
-			if (mem_read(node).keys[i] == INVALID) {
+			if (mem_read(node, memory).keys[i] == INVALID) {
 				fprintf(stream, "out of children\n");
 				break;
-			} else if (mem_read(node).values[i].ptr >= MEM_SIZE) {
+			} else if (mem_read(node, memory).values[i].ptr >= MEM_SIZE) {
 				fprintf(stream,
 					"invalid, address %u >= %u\n",
-					mem_read(node).values[i].ptr, MEM_SIZE
+					mem_read(node, memory).values[i].ptr, MEM_SIZE
 				);
 				result = false;
 			} else if (!validate_children(
-					root, mem_read(node).values[i].ptr, stream
+					root, mem_read(node, memory).values[i].ptr, stream, memory
 				)) {
 				result = false;
 			}
@@ -84,15 +84,15 @@ static bool validate_children(bptr_t root, bptr_t node, FILE *stream) {
 	return result;
 }
 
-bool validate(bptr_t root, FILE *stream) {
-	return validate_children(root, root, stream);
+bool validate(bptr_t root, FILE *stream, Node const *memory) {
+	return validate_children(root, root, stream, memory);
 }
 
 
 //! @return `true` if `node` and all of its children are unlocked,
 //!         `false` otherwise
-static bool subtree_unlocked(bptr_t node, FILE *stream) {
-	Node n = mem_read(node);
+static bool subtree_unlocked(bptr_t node, FILE *stream, Node const *memory) {
+	Node n = mem_read(node, memory);
 	bool result = !lock_test(&n.lock);
 
 	fprintf(stream, "Checking mem[%u]'s children...\n", node);
@@ -102,7 +102,7 @@ static bool subtree_unlocked(bptr_t node, FILE *stream) {
 	} else {
 		for (li_t i = 0; i < TREE_ORDER; ++i) {
 			if (n.keys[i] == INVALID) return result;
-			result |= subtree_unlocked(n.values->ptr, stream);
+			result |= subtree_unlocked(n.values->ptr, stream, memory);
 		}
 	}
 
@@ -110,6 +110,6 @@ static bool subtree_unlocked(bptr_t node, FILE *stream) {
 }
 
 //! @return `true` if all nodes in this tree are unlocked, `false` otherwise
-bool is_unlocked(bptr_t root, FILE *stream) {
-	return subtree_unlocked(root, stream);
+bool is_unlocked(bptr_t root, FILE *stream, Node const *memory) {
+	return subtree_unlocked(root, stream, memory);
 }

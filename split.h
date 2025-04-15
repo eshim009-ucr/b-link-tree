@@ -3,6 +3,8 @@
 
 
 #include "types.h"
+
+typedef struct Node Node;
 typedef struct AddrNode AddrNode;
 
 
@@ -17,7 +19,8 @@ ErrorCode split_node(
 	//! [inout] The parent of the node to split
 	AddrNode *parent,
 	//! [out] The contents of the split node's new sibling
-	AddrNode *sibling
+	AddrNode *sibling,
+	Node *memory
 );
 
 

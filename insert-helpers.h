@@ -31,7 +31,8 @@ ErrorCode insert_after_split(
 	//! [out] The original node to insert into
 	AddrNode *leaf,
 	//! [out] The new sibling to insert into
-	AddrNode *sibling
+	AddrNode *sibling,
+	Node *memory
 );
 
 //! @brief Replace a key without changing its corresponding value
