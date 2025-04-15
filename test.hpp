@@ -366,3 +366,50 @@ TEST(ParallelTest, InterleavedInsert) {
 	EXPECT_TRUE(validate(root, log_stream, memory));
 	fprintf(log_stream, "\n\n");
 }
+
+TEST(ParallelTest, CrossfadeInsert) {
+	const testing::TestInfo* const test_info =
+		testing::UnitTest::GetInstance()->current_test_info();
+	fprintf(log_stream, "=== %s.%s ===\n",
+		test_info->test_suite_name(), test_info->name()
+	);
+
+	pthread_t thread_even, thread_odd;
+	bptr_t root = 0;
+	si_args odd_args = {
+		.start = 1,
+		.end = (TREE_ORDER/2)*(MAX_LEAVES+1),
+		.stride = 2,
+		.root = &root
+	};
+	si_args even_args = odd_args;
+	even_args.start = odd_args.end;
+	even_args.end = (odd_args.start >> 1) << 1;
+	even_args.stride = -odd_args.stride;
+
+	mem_reset_all(memory);
+
+	pthread_create(&thread_even, NULL, stride_insert, (void*) &even_args);
+	pthread_create(&thread_odd, NULL, stride_insert, (void*) &odd_args);
+	pthread_join(thread_even, NULL);
+	pthread_join(thread_odd, NULL);
+
+	dump_node_list(log_stream, root, memory);
+
+	// Check that they're instantiated in memory correctly
+	uint_fast8_t next = 1;
+	for (bptr_t i = 0; i < MAX_LEAVES; ++i) {
+		for (li_t j = 0; j < TREE_ORDER; ++j) {
+			if (mem_read(i, memory).keys[j] == INVALID) {
+				break;
+			} else {
+				EXPECT_EQ(mem_read(i, memory).keys[j], next);
+				EXPECT_EQ(mem_read(i, memory).values[j].data, -next);
+				next++;
+			}
+		}
+	}
+
+	EXPECT_TRUE(validate(root, log_stream, memory));
+	fprintf(log_stream, "\n\n");
+}
