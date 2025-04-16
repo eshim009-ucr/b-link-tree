@@ -298,9 +298,9 @@ TEST(InsertTest, SequentialInsert) {
 
 
 struct si_args {
-	uint_fast16_t start;
-	uint_fast16_t end;
-	int_fast16_t stride;
+	int_fast32_t start;
+	int_fast32_t end;
+	int_fast32_t stride;
 	bptr_t *root;
 };
 
@@ -308,21 +308,20 @@ void *stride_insert(void *argv){
 	si_args args = *(si_args *)argv;
 	bval_t value;
 	if (args.stride > 0 && args.end > args.start) {
-		for (uint_fast16_t i = args.start; i <= args.end; i += args.stride) {
+		for (int_fast32_t i = args.start; i <= args.end; i += args.stride) {
 			value.data = -i;
 			insert(args.root, i, value, memory);
 		}
 	} else if (args.stride < 0 && args.end < args.start) {
-		for (uint_fast16_t i = args.start; i >= args.end; i += args.stride) {
+		for (int_fast32_t i = args.start; i >= args.end; i += args.stride) {
 			value.data = -i;
 			insert(args.root, i, value, memory);
-			dump_node_list(log_stream, *args.root, memory);
 		}
 	}
 	pthread_exit(NULL);
 }
 
-TEST(ParallelTest, InterleavedInsert) {
+TEST(ParallelTest, InterleavedAscending) {
 	const testing::TestInfo* const test_info =
 		testing::UnitTest::GetInstance()->current_test_info();
 	fprintf(log_stream, "=== %s.%s ===\n",
@@ -350,17 +349,75 @@ TEST(ParallelTest, InterleavedInsert) {
 	dump_node_list(log_stream, root, memory);
 
 	// Check that they're instantiated in memory correctly
-	uint_fast8_t next = 1;
-	for (bptr_t i = 0; i < MAX_LEAVES; ++i) {
+	uint_fast8_t next_val = 1;
+	AddrNode node;
+	node.addr = 0;
+	while (node.addr != INVALID) {
+		node.node = mem_read(node.addr, memory);
 		for (li_t j = 0; j < TREE_ORDER; ++j) {
-			if (mem_read(i, memory).keys[j] == INVALID) {
+			if (node.node.keys[j] == INVALID) {
 				break;
 			} else {
-				EXPECT_EQ(mem_read(i, memory).keys[j], next);
-				EXPECT_EQ(mem_read(i, memory).values[j].data, -next);
-				next++;
+				EXPECT_EQ(node.node.keys[j], next_val);
+				EXPECT_EQ(node.node.values[j].data, -next_val);
+				next_val++;
 			}
 		}
+		node.addr = node.node.next;
+	}
+
+	EXPECT_TRUE(validate(root, log_stream, memory));
+	fprintf(log_stream, "\n\n");
+}
+
+TEST(ParallelTest, InterleavedDescending) {
+	const testing::TestInfo* const test_info =
+		testing::UnitTest::GetInstance()->current_test_info();
+	fprintf(log_stream, "=== %s.%s ===\n",
+		test_info->test_suite_name(), test_info->name()
+	);
+
+	pthread_t thread_even, thread_odd;
+	bptr_t root = 0;
+	si_args odd_args = {
+		.end = 1,
+		.stride = -2,
+		.root = &root
+	};
+	si_args even_args = odd_args;
+	if ((TREE_ORDER/2)*(MAX_LEAVES+1) % 2 == 0) {
+		even_args.start = (TREE_ORDER/2)*(MAX_LEAVES+1);
+		odd_args.start = even_args.start - 1;
+	} else {
+		odd_args.start = (TREE_ORDER/2)*(MAX_LEAVES+1);
+		even_args.start = even_args.start - 1;
+	}
+
+	mem_reset_all(memory);
+
+	pthread_create(&thread_even, NULL, stride_insert, (void*) &even_args);
+	pthread_create(&thread_odd, NULL, stride_insert, (void*) &odd_args);
+	pthread_join(thread_even, NULL);
+	pthread_join(thread_odd, NULL);
+
+	dump_node_list(log_stream, root, memory);
+
+	// Check that they're instantiated in memory correctly
+	uint_fast8_t next_val = 1;
+	AddrNode node;
+	node.addr = 0;
+	while (node.addr != INVALID) {
+		node.node = mem_read(node.addr, memory);
+		for (li_t j = 0; j < TREE_ORDER; ++j) {
+			if (node.node.keys[j] == INVALID) {
+				break;
+			} else {
+				EXPECT_EQ(node.node.keys[j], next_val);
+				EXPECT_EQ(node.node.values[j].data, -next_val);
+				next_val++;
+			}
+		}
+		node.addr = node.node.next;
 	}
 
 	EXPECT_TRUE(validate(root, log_stream, memory));
@@ -384,7 +441,7 @@ TEST(ParallelTest, CrossfadeInsert) {
 	};
 	si_args even_args = odd_args;
 	even_args.start = odd_args.end;
-	even_args.end = (odd_args.start >> 1) << 1;
+	even_args.end = odd_args.start % 2 == 0 ? odd_args.start : (odd_args.start + 1);
 	even_args.stride = -odd_args.stride;
 
 	mem_reset_all(memory);
@@ -397,17 +454,21 @@ TEST(ParallelTest, CrossfadeInsert) {
 	dump_node_list(log_stream, root, memory);
 
 	// Check that they're instantiated in memory correctly
-	uint_fast8_t next = 1;
-	for (bptr_t i = 0; i < MAX_LEAVES; ++i) {
+	uint_fast8_t next_val = 1;
+	AddrNode node;
+	node.addr = 0;
+	while (node.addr != INVALID) {
+		node.node = mem_read(node.addr, memory);
 		for (li_t j = 0; j < TREE_ORDER; ++j) {
-			if (mem_read(i, memory).keys[j] == INVALID) {
+			if (node.node.keys[j] == INVALID) {
 				break;
 			} else {
-				EXPECT_EQ(mem_read(i, memory).keys[j], next);
-				EXPECT_EQ(mem_read(i, memory).values[j].data, -next);
-				next++;
+				EXPECT_EQ(node.node.keys[j], next_val);
+				EXPECT_EQ(node.node.values[j].data, -next_val);
+				next_val++;
 			}
 		}
+		node.addr = node.node.next;
 	}
 
 	EXPECT_TRUE(validate(root, log_stream, memory));
