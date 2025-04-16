@@ -9,6 +9,7 @@ extern "C" {
 #include "../node.h"
 #include "../validate.h"
 };
+#include "helpers.hpp"
 #include <gtest/gtest.h>
 #include <pthread.h>
 
@@ -120,19 +121,7 @@ TEST(InsertTest, SequentialInsert) {
 		dump_node_list(log_stream, root, memory);
 		ASSERT_TRUE(is_unlocked(root, log_stream, memory));
 	}
-	// Check that they're instantiated in memory correctly
-	uint_fast8_t next = 1;
-	for (bptr_t i = 0; i < MAX_LEAVES; ++i) {
-		for (li_t j = 0; j < TREE_ORDER; ++j) {
-			if (mem_read(i, memory).keys[j] == INVALID) {
-				break;
-			} else {
-				EXPECT_EQ(mem_read(i, memory).keys[j], next);
-				EXPECT_EQ(mem_read(i, memory).values[j].data, -next);
-				next++;
-			}
-		}
-	}
+	check_inserted_leaves();
 
 	EXPECT_TRUE(validate(root, log_stream, memory));
 	fprintf(log_stream, "\n\n");

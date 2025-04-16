@@ -43,23 +43,7 @@ TEST(ParallelTest, InterleavedAscending) {
 
 	dump_node_list(log_stream, root, memory);
 
-	// Check that they're instantiated in memory correctly
-	uint_fast8_t next_val = 1;
-	AddrNode node;
-	node.addr = 0;
-	while (node.addr != INVALID) {
-		node.node = mem_read(node.addr, memory);
-		for (li_t j = 0; j < TREE_ORDER; ++j) {
-			if (node.node.keys[j] == INVALID) {
-				break;
-			} else {
-				EXPECT_EQ(node.node.keys[j], next_val);
-				EXPECT_EQ(node.node.values[j].data, -next_val);
-				next_val++;
-			}
-		}
-		node.addr = node.node.next;
-	}
+	check_inserted_leaves();
 
 	EXPECT_TRUE(validate(root, log_stream, memory));
 	fprintf(log_stream, "\n\n");
@@ -97,23 +81,7 @@ TEST(ParallelTest, InterleavedDescending) {
 
 	dump_node_list(log_stream, root, memory);
 
-	// Check that they're instantiated in memory correctly
-	uint_fast8_t next_val = 1;
-	AddrNode node;
-	node.addr = 0;
-	while (node.addr != INVALID) {
-		node.node = mem_read(node.addr, memory);
-		for (li_t j = 0; j < TREE_ORDER; ++j) {
-			if (node.node.keys[j] == INVALID) {
-				break;
-			} else {
-				EXPECT_EQ(node.node.keys[j], next_val);
-				EXPECT_EQ(node.node.values[j].data, -next_val);
-				next_val++;
-			}
-		}
-		node.addr = node.node.next;
-	}
+	check_inserted_leaves();
 
 	EXPECT_TRUE(validate(root, log_stream, memory));
 	fprintf(log_stream, "\n\n");
@@ -148,23 +116,7 @@ TEST(ParallelTest, CrossfadeInsert) {
 
 	dump_node_list(log_stream, root, memory);
 
-	// Check that they're instantiated in memory correctly
-	uint_fast8_t next_val = 1;
-	AddrNode node;
-	node.addr = 0;
-	while (node.addr != INVALID) {
-		node.node = mem_read(node.addr, memory);
-		for (li_t j = 0; j < TREE_ORDER; ++j) {
-			if (node.node.keys[j] == INVALID) {
-				break;
-			} else {
-				EXPECT_EQ(node.node.keys[j], next_val);
-				EXPECT_EQ(node.node.values[j].data, -next_val);
-				next_val++;
-			}
-		}
-		node.addr = node.node.next;
-	}
+	check_inserted_leaves();
 
 	EXPECT_TRUE(validate(root, log_stream, memory));
 	fprintf(log_stream, "\n\n");
