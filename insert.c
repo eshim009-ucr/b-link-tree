@@ -17,7 +17,7 @@ ErrorCode insert(volatile bptr_t *root, bkey_t key, bval_t value, volatile Node 
 	// Initialize lineage array
 	memset(lineage, INVALID, MAX_LEVELS*sizeof(bptr_t));
 	// Try to trace lineage
-	status = trace_lineage(*root, key, lineage, memory);
+	status = trace_lineage(root, key, lineage, memory);
 	if (status != SUCCESS) return status;
 	// Load leaf
 	i_leaf = get_leaf_idx(lineage);

@@ -41,11 +41,11 @@ TEST(ParallelTest, InterleavedAscending) {
 	pthread_join(thread_even, NULL);
 	pthread_join(thread_odd, NULL);
 
-	dump_node_list(log_stream, root, memory);
+	dump_node_list(log_stream, &root, memory);
 
 	check_inserted_leaves();
 
-	EXPECT_TRUE(validate(root, log_stream, memory));
+	EXPECT_TRUE(validate(&root, log_stream, memory));
 	fprintf(log_stream, "\n\n");
 }
 
@@ -79,11 +79,11 @@ TEST(ParallelTest, InterleavedDescending) {
 	pthread_join(thread_even, NULL);
 	pthread_join(thread_odd, NULL);
 
-	dump_node_list(log_stream, root, memory);
+	dump_node_list(log_stream, &root, memory);
 
 	check_inserted_leaves();
 
-	EXPECT_TRUE(validate(root, log_stream, memory));
+	EXPECT_TRUE(validate(&root, log_stream, memory));
 	fprintf(log_stream, "\n\n");
 }
 
@@ -114,11 +114,11 @@ TEST(ParallelTest, CrossfadeInsert) {
 	pthread_join(thread_even, NULL);
 	pthread_join(thread_odd, NULL);
 
-	dump_node_list(log_stream, root, memory);
+	dump_node_list(log_stream, &root, memory);
 
 	check_inserted_leaves();
 
-	EXPECT_TRUE(validate(root, log_stream, memory));
+	EXPECT_TRUE(validate(&root, log_stream, memory));
 	fprintf(log_stream, "\n\n");
 }
 

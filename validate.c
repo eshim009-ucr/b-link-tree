@@ -14,10 +14,10 @@ static li_t num_children(bptr_t node, volatile Node const *memory) {
 
 
 //! @return `true` for passing, `false` for failing
-static bool validate_root(bptr_t root, FILE *stream, volatile Node const *memory) {
-	li_t n_child = num_children(root, memory);
-	bool result = is_leaf(root) || n_child >= 2;
-	fprintf(stream, "Validating mem[%u] (root)...", root);
+static bool validate_root(volatile bptr_t const *root, FILE *stream, volatile Node const *memory) {
+	li_t n_child = num_children(*root, memory);
+	bool result = is_leaf(*root) || n_child >= 2;
+	fprintf(stream, "Validating mem[%u] (root)...", *root);
 	if (result) {
 		fprintf(stream, "valid!\n");
 	} else {
@@ -31,8 +31,8 @@ static bool validate_root(bptr_t root, FILE *stream, volatile Node const *memory
 }
 
 //! @return `true` for passing, `false` for failing
-static bool validate_node(bptr_t root, bptr_t node, FILE *stream, volatile Node const *memory) {
-	if (node == root) {
+static bool validate_node(volatile bptr_t const *root, bptr_t node, FILE *stream, volatile Node const *memory) {
+	if (node == *root) {
 		return validate_root(root, stream, memory);
 	} else {
 		fprintf(stream, "mem[%u]...", node);
@@ -55,7 +55,7 @@ static bool validate_node(bptr_t root, bptr_t node, FILE *stream, volatile Node 
 	}
 }
 
-static bool validate_children(bptr_t root, bptr_t node, FILE *stream, volatile Node const *memory) {
+static bool validate_children(volatile bptr_t const *root, bptr_t node, FILE *stream, volatile Node const *memory) {
 	bool result = true;
 	if (!validate_node(root, node, stream, memory)) {
 		result = false;
@@ -84,8 +84,8 @@ static bool validate_children(bptr_t root, bptr_t node, FILE *stream, volatile N
 	return result;
 }
 
-bool validate(bptr_t root, FILE *stream, volatile Node const *memory) {
-	return validate_children(root, root, stream, memory);
+bool validate(volatile bptr_t const *root, FILE *stream, volatile Node const *memory) {
+	return validate_children(root, *root, stream, memory);
 }
 
 
@@ -110,6 +110,6 @@ static bool subtree_unlocked(bptr_t node, FILE *stream, volatile Node const *mem
 }
 
 //! @return `true` if all nodes in this tree are unlocked, `false` otherwise
-bool is_unlocked(bptr_t root, FILE *stream, volatile Node const *memory) {
-	return subtree_unlocked(root, stream, memory);
+bool is_unlocked(volatile bptr_t const *root, FILE *stream, volatile Node const *memory) {
+	return subtree_unlocked(*root, stream, memory);
 }

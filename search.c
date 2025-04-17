@@ -3,10 +3,10 @@
 #include "node.h"
 
 
-bstatusval_t search(bptr_t root, bkey_t key, volatile Node const *memory) {
+bstatusval_t search(volatile bptr_t const *root, bkey_t key, volatile Node const *memory) {
 	bstatusval_t result;
 	AddrNode n;
-	n.addr = root;
+	n.addr = *root;
 
 	// Iterate until we hit a leaf
 	while (!is_leaf(n.addr)) {

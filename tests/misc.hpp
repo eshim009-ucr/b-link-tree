@@ -31,7 +31,7 @@ TEST(InitTest, Tree) {
 		}
 	}
 
-	EXPECT_TRUE(is_unlocked(root, log_stream, memory));
+	EXPECT_TRUE(is_unlocked(&root, log_stream, memory));
 	fprintf(log_stream, "\n\n");
 }
 
@@ -55,10 +55,10 @@ TEST(ValidateTest, RootOneChild) {
 	lchild.node.keys[3] = 5; lchild.node.values[3].data = -5;
 	mem_write_unlock(&root, memory);
 	mem_write_unlock(&lchild, memory);
-	dump_node_list(log_stream, root.addr, memory);
+	dump_node_list(log_stream, &root.addr, memory);
 
-	EXPECT_FALSE(validate(root.addr, log_stream, memory));
-	EXPECT_TRUE(is_unlocked(root.addr, log_stream, memory));
+	EXPECT_FALSE(validate(&root.addr, log_stream, memory));
+	EXPECT_TRUE(is_unlocked(&root.addr, log_stream, memory));
 	fprintf(log_stream, "\n\n");
 }
 
