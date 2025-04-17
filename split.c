@@ -21,12 +21,12 @@ inline static void init_node(Node *node) {
 //! Acquires a lock on the sibling node
 static ErrorCode alloc_sibling(
 	//! [in] Root of the tree the nodes reside in
-	bptr_t const *root,
+	volatile bptr_t const *root,
 	//! [in] The node to split
 	AddrNode *leaf,
 	//! [out] The contents of the split node's new sibling
 	AddrNode *sibling,
-	Node *memory
+	volatile Node *memory
 ) {
 	const uint_fast8_t level = get_level(leaf->addr);
 
@@ -65,14 +65,14 @@ static ErrorCode alloc_sibling(
 //!         operation
 static ErrorCode split_root(
 	//! [in] Root of the tree the nodes reside in
-	bptr_t *root,
+	volatile bptr_t *root,
 	//! [in] The node to split
 	AddrNode const *leaf,
 	//! [inout] The parent of the node to split
 	AddrNode *parent,
 	//! [in] The contents of the split node's new sibling
 	AddrNode const *sibling,
-	Node *memory
+	volatile Node *memory
 ) {
 	// If this is the only node
 	// We need to create the first inner node
@@ -102,7 +102,7 @@ static ErrorCode split_root(
 //!         operation
 static ErrorCode split_nonroot(
 	//! [in] Root of the tree the nodes reside in
-	bptr_t const *root,
+	volatile bptr_t const *root,
 	//! [in] The node to split
 	AddrNode const *leaf,
 	//! [inout] The parent of the node to split
@@ -134,7 +134,7 @@ static ErrorCode split_nonroot(
 
 
 ErrorCode split_node(
-	bptr_t *root, AddrNode *leaf, AddrNode *parent, AddrNode *sibling, Node *memory
+	volatile bptr_t *root, AddrNode *leaf, AddrNode *parent, AddrNode *sibling, volatile Node *memory
 ) {
 	ErrorCode status = alloc_sibling(root, leaf, sibling, memory);
 	if (status != SUCCESS) return status;

@@ -18,11 +18,11 @@ struct si_args {
 	//! value
 	int_fast32_t stride;
 	//! Pointer to the tree root
-	bptr_t *root;
+	volatile bptr_t *root;
 };
 
 
-extern Node memory[MEM_SIZE];
+extern volatile Node memory[MEM_SIZE];
 
 //! @brief Thread function for inserting values over a range with a set interval
 //! between them

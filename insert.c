@@ -7,7 +7,7 @@
 #include <string.h>
 
 
-ErrorCode insert(bptr_t *root, bkey_t key, bval_t value, Node *memory) {
+ErrorCode insert(volatile bptr_t *root, bkey_t key, bval_t value, volatile Node *memory) {
 	ErrorCode status;
 	li_t i_leaf;
 	AddrNode leaf, parent, sibling;

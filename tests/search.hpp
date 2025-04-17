@@ -12,7 +12,7 @@ extern "C" {
 #include <gtest/gtest.h>
 
 extern FILE *log_stream;
-extern Node memory[MEM_SIZE];
+extern volatile Node memory[MEM_SIZE];
 
 
 #if TREE_ORDER >= 4

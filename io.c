@@ -57,7 +57,7 @@ void dump_values(FILE *stream, Node const *node) {
 }
 
 
-void dump_node_list(FILE *stream, bptr_t root, Node const *memory) {
+void dump_node_list(FILE *stream, bptr_t root, volatile Node const *memory) {
 	Node n;
 	uint_fast16_t i, r, c;
 	fprintf(stream, "LEAVES\n%2u ", 0);
@@ -73,7 +73,10 @@ void dump_node_list(FILE *stream, bptr_t root, Node const *memory) {
 	fprintf(stream, "\n");
 	fprintf(stream, "INTERNAL NODES\n");
 	for (r = 1; r < (MAX_LEVELS-1); ++r) {
-		fprintf(stream, "%2lu ", r*MAX_NODES_PER_LEVEL);
+		#pragma GCC diagnostic push
+		#pragma GCC diagnostic ignored "-Wformat"
+		fprintf(stream, "%2u ", r*MAX_NODES_PER_LEVEL);
+		#pragma GCC diagnostic pop
 		for (c = 0; c < MAX_NODES_PER_LEVEL; ++c) {
 			n = mem_read(r*MAX_NODES_PER_LEVEL + c, memory);
 			dump_keys(stream, &n);

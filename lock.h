@@ -28,7 +28,7 @@
 
 
 //! @brief Perform an atomic test-and-set operation on the given lock
-static inline bool test_and_set(lock_t *lock) {
+static inline bool test_and_set(volatile lock_t *lock) {
 #if defined(CSIM) || defined(__SYNTHESIS__)
 	bool old = *lock;
 	*lock = true;
@@ -41,7 +41,7 @@ static inline bool test_and_set(lock_t *lock) {
 }
 
 //! @brief Initialize a lock to its default (unset) value
-static inline void init_lock(lock_t *lock) {
+static inline void init_lock(volatile lock_t *lock) {
 #if defined(CSIM) || defined(__SYNTHESIS__)
 	*lock = 0;
 #elif !defined(__cplusplus)
@@ -49,7 +49,7 @@ static inline void init_lock(lock_t *lock) {
 #endif
 }
 
-static inline bool lock_test(lock_t const *lock) {
+static inline bool lock_test(volatile lock_t const *lock) {
 	//! @todo Do this better.
 	//! x86 defines atomic_flag as 0 for unset,
 	//! but this is not a guarantee for all architectures
@@ -58,12 +58,12 @@ static inline bool lock_test(lock_t const *lock) {
 
 
 //! @brief Set the given lock to held
-static inline void lock_p(lock_t *lock) {
+static inline void lock_p(volatile lock_t *lock) {
 	while (test_and_set(lock));
 }
 
 //! @brief Release the given lock
-static inline void lock_v(lock_t *lock) {
+static inline void lock_v(volatile lock_t *lock) {
 	assert(lock_test(lock));
 #if defined(CSIM) || defined(__SYNTHESIS__)
 	*lock = 0;
