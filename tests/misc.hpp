@@ -11,7 +11,7 @@ extern "C" {
 #include <gtest/gtest.h>
 
 extern FILE *log_stream;
-extern volatile Node memory[MEM_SIZE];
+extern Node memory[MEM_SIZE];
 
 
 TEST(InitTest, Tree) {

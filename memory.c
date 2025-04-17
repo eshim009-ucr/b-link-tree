@@ -5,7 +5,7 @@
 #include <string.h>
 
 
-Node mem_read(bptr_t address, volatile Node const *memory) {
+Node mem_read(bptr_t address, Node const *memory) {
 	assert(address < MEM_SIZE);
 	return memory[address];
 }
@@ -17,8 +17,8 @@ Node mem_read(bptr_t address, volatile Node const *memory) {
 //!
 //! @todo Set up multiple locks for specific regions of memory, such as by
 //! address ranges or hashes to allow higher write bandwidth.
-Node mem_read_lock(bptr_t address, volatile Node *memory) {
-	static lock_t local_readlock = 0;
+Node mem_read_lock(bptr_t address, Node *memory) {
+	static lock_t local_readlock = LOCK_INIT;
 	Node tmp;
 
 	assert(address < MEM_SIZE);
@@ -37,27 +37,27 @@ Node mem_read_lock(bptr_t address, volatile Node *memory) {
 	return tmp;
 }
 
-void mem_write_unlock(AddrNode *node, volatile Node *memory) {
+void mem_write_unlock(AddrNode *node, Node *memory) {
 	assert(node->addr < MEM_SIZE);
 	lock_v(&node->node.lock);
 	memory[node->addr] = node->node;
 }
 
-void mem_unlock(bptr_t address, volatile Node *memory) {
+void mem_unlock(bptr_t address, Node *memory) {
 	assert(address < MEM_SIZE);
 	lock_v(&memory[address].lock);
 }
 
-void mem_reset_all(volatile Node *memory) {
+void mem_reset_all(Node *memory) {
 	#pragma GCC diagnostic push
 	#pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
 	memset(memory, INVALID, MEM_SIZE*sizeof(Node));
 	#pragma GCC diagnostic pop
 	for (bptr_t i = 0; i < MEM_SIZE; i++) {
-		init_lock(&memory[i].lock);
+		memory[i].lock = LOCK_INIT;
 	}
 }
 
-bptr_t ptr_to_addr(void *ptr, volatile Node const *memory) {
+bptr_t ptr_to_addr(void const *ptr, Node const *memory) {
 	return (ptr - (void *) memory) / sizeof(Node);
 }

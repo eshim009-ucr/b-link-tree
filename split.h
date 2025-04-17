@@ -13,14 +13,14 @@ typedef struct AddrNode AddrNode;
 //!         operation
 ErrorCode split_node(
 	//! [inout] Root of the tree the nodes reside in
-	volatile bptr_t *root,
+	bptr_t *root,
 	//! [in] The node to split
 	AddrNode *leaf,
 	//! [inout] The parent of the node to split
 	AddrNode *parent,
 	//! [out] The contents of the split node's new sibling
 	AddrNode *sibling,
-	volatile Node *memory
+	Node *memory
 );
 
 

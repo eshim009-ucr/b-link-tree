@@ -13,7 +13,7 @@ extern "C" {
 
 
 extern FILE *log_stream;
-extern volatile Node memory[MEM_SIZE];
+extern Node memory[MEM_SIZE];
 
 
 TEST(ParallelTest, InterleavedAscending) {
@@ -24,7 +24,7 @@ TEST(ParallelTest, InterleavedAscending) {
 	);
 
 	pthread_t thread_even, thread_odd;
-	volatile bptr_t root = 0;
+	bptr_t root = 0;
 	si_args odd_args = {
 		.start = 1,
 		.end = (TREE_ORDER/2)*(MAX_LEAVES+1),
@@ -57,7 +57,7 @@ TEST(ParallelTest, InterleavedDescending) {
 	);
 
 	pthread_t thread_even, thread_odd;
-	volatile bptr_t root = 0;
+	bptr_t root = 0;
 	si_args odd_args = {
 		.end = 1,
 		.stride = -2,
@@ -95,7 +95,7 @@ TEST(ParallelTest, CrossfadeInsert) {
 	);
 
 	pthread_t thread_even, thread_odd;
-	volatile bptr_t root = 0;
+	bptr_t root = 0;
 	si_args odd_args = {
 		.start = 1,
 		.end = (TREE_ORDER/2)*(MAX_LEAVES+1),

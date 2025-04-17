@@ -14,7 +14,7 @@ extern "C" {
 #include <pthread.h>
 
 extern FILE *log_stream;
-extern volatile Node memory[MEM_SIZE];
+extern Node memory[MEM_SIZE];
 
 
 TEST(InsertTest, LeafNode) {

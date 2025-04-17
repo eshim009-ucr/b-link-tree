@@ -57,7 +57,7 @@ void dump_values(FILE *stream, Node const *node) {
 }
 
 
-void dump_node_list(FILE *stream, bptr_t root, volatile Node const *memory) {
+void dump_node_list(FILE *stream, bptr_t root, Node const *memory) {
 	Node n;
 	uint_fast16_t i, r, c;
 	fprintf(stream, "LEAVES\n%2u ", 0);

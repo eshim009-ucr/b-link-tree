@@ -5,7 +5,7 @@
 
 
 FILE *log_stream = fopen("log.txt", "w");
-volatile Node memory[MEM_SIZE];
+Node memory[MEM_SIZE];
 
 
 int main(int argc, char **argv) {

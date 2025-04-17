@@ -4,8 +4,8 @@ SRC=$(SRC_C) $(SRC_CPP)
 OBJ_C=$(subst .c,.o,$(SRC_C))
 OBJ_CPP=$(subst .cpp,.o,$(SRC_CPP))
 OBJ=$(OBJ_C) $(OBJ_CPP)
-CFLAGS=-Wall -std=c11
-CXXFLAGS=-Wall -std=c++14
+CFLAGS=-Wall -std=c11 -g
+CXXFLAGS=-Wall -std=c++14 -g
 LDLIBS=-lgtest -lpthread
 
 
