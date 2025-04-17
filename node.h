@@ -31,7 +31,11 @@ struct Node {
 	bptr_t next;
 	//! @brief Used to restrict concurrent modifications to this node
 	lock_t lock;
-} __attribute__((packed));
+}
+#ifdef HLS
+__attribute__((packed))
+#endif
+;
 typedef struct Node Node;
 
 //! @brief Traverse the tree structure in search of the given key
@@ -56,7 +60,11 @@ void clear(Node *n);
 struct AddrNode {
 	Node node;
 	bptr_t addr;
-} __attribute__((packed));
+}
+#ifdef HLS
+__attribute__((packed))
+#endif
+;
 typedef struct AddrNode AddrNode;
 
 //! @brief Check if a node at the given address is a leaf node or an inner node
