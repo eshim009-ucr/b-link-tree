@@ -11,6 +11,10 @@ extern "C" {
 #include "helpers.hpp"
 #include <gtest/gtest.h>
 
+// Multithreading bugs are often dependent on random ways that threads can
+// interleave. Testing multiple times gives more chances for these bugs to
+// manifest themselves.
+#define PARALLEL_RERUNS 16
 
 extern FILE *log_stream;
 extern Node memory[MEM_SIZE];
@@ -34,18 +38,22 @@ TEST(ParallelTest, InterleavedAscending) {
 	si_args even_args = odd_args;
 	even_args.start = 2;
 
-	mem_reset_all(memory);
+	for (uint_fast8_t i = 0; i < PARALLEL_RERUNS; ++i) {
+		fprintf(log_stream, "Run %d\n", i+1);
+		root = 0;
+		mem_reset_all(memory);
 
-	pthread_create(&thread_even, NULL, stride_insert, (void*) &even_args);
-	pthread_create(&thread_odd, NULL, stride_insert, (void*) &odd_args);
-	pthread_join(thread_even, NULL);
-	pthread_join(thread_odd, NULL);
+		pthread_create(&thread_even, NULL, stride_insert, (void*) &even_args);
+		pthread_create(&thread_odd, NULL, stride_insert, (void*) &odd_args);
+		pthread_join(thread_even, NULL);
+		pthread_join(thread_odd, NULL);
 
-	dump_node_list(log_stream, root, memory);
+		dump_node_list(log_stream, root, memory);
 
-	check_inserted_leaves();
+		check_inserted_leaves();
 
-	EXPECT_TRUE(validate(root, log_stream, memory));
+		EXPECT_TRUE(validate(root, log_stream, memory));
+	}
 	fprintf(log_stream, "\n\n");
 }
 
@@ -72,18 +80,22 @@ TEST(ParallelTest, InterleavedDescending) {
 		even_args.start = even_args.start - 1;
 	}
 
-	mem_reset_all(memory);
+	for (uint_fast8_t i = 0; i < PARALLEL_RERUNS; ++i) {
+		fprintf(log_stream, "Run %d\n", i+1);
+		root = 0;
+		mem_reset_all(memory);
 
-	pthread_create(&thread_even, NULL, stride_insert, (void*) &even_args);
-	pthread_create(&thread_odd, NULL, stride_insert, (void*) &odd_args);
-	pthread_join(thread_even, NULL);
-	pthread_join(thread_odd, NULL);
+		pthread_create(&thread_even, NULL, stride_insert, (void*) &even_args);
+		pthread_create(&thread_odd, NULL, stride_insert, (void*) &odd_args);
+		pthread_join(thread_even, NULL);
+		pthread_join(thread_odd, NULL);
 
-	dump_node_list(log_stream, root, memory);
+		dump_node_list(log_stream, root, memory);
 
-	check_inserted_leaves();
+		check_inserted_leaves();
 
-	EXPECT_TRUE(validate(root, log_stream, memory));
+		EXPECT_TRUE(validate(root, log_stream, memory));
+	}
 	fprintf(log_stream, "\n\n");
 }
 
@@ -107,18 +119,22 @@ TEST(ParallelTest, CrossfadeInsert) {
 	even_args.end = odd_args.start % 2 == 0 ? odd_args.start : (odd_args.start + 1);
 	even_args.stride = -odd_args.stride;
 
-	mem_reset_all(memory);
+	for (uint_fast8_t i = 0; i < PARALLEL_RERUNS; ++i) {
+		fprintf(log_stream, "Run %d\n", i+1);
+		root = 0;
+		mem_reset_all(memory);
 
-	pthread_create(&thread_even, NULL, stride_insert, (void*) &even_args);
-	pthread_create(&thread_odd, NULL, stride_insert, (void*) &odd_args);
-	pthread_join(thread_even, NULL);
-	pthread_join(thread_odd, NULL);
+		pthread_create(&thread_even, NULL, stride_insert, (void*) &even_args);
+		pthread_create(&thread_odd, NULL, stride_insert, (void*) &odd_args);
+		pthread_join(thread_even, NULL);
+		pthread_join(thread_odd, NULL);
 
-	dump_node_list(log_stream, root, memory);
+		dump_node_list(log_stream, root, memory);
 
-	check_inserted_leaves();
+		check_inserted_leaves();
 
-	EXPECT_TRUE(validate(root, log_stream, memory));
+		EXPECT_TRUE(validate(root, log_stream, memory));
+	}
 	fprintf(log_stream, "\n\n");
 }
 

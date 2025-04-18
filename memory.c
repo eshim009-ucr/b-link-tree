@@ -52,10 +52,7 @@ void mem_unlock(bptr_t address, Node *memory) {
 }
 
 void mem_reset_all(Node *memory) {
-	#pragma GCC diagnostic push
-	#pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
 	memset(memory, INVALID, MEM_SIZE*sizeof(Node));
-	#pragma GCC diagnostic pop
 	for (bptr_t i = 0; i < MEM_SIZE; i++) {
 		memory[i].lock = LOCK_INIT;
 	}
