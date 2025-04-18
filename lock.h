@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include <pthread.h>
 #include <assert.h>
+#include <string.h>
 
 #ifdef HLS
 typedef bool lock_t;
@@ -27,10 +28,11 @@ static inline bool test_and_set(lock_t *lock) {
 }
 
 static inline bool lock_test(lock_t const *lock) {
-	//! @todo Do this better.
-	//! x86 defines atomic_flag as 0 for unset,
-	//! but this is not a guarantee for all architectures
-	return *((bool *) lock);
+	lock_t unset = LOCK_INIT;
+	//! @warning This should work in most cases, but allegedly technically if
+	//! the system's lock type is padded, then theoretically the padding may not
+	//! be equal and cause an incorrect return of true
+	return memcmp(lock, &unset, sizeof(lock_t));
 }
 
 
@@ -45,11 +47,11 @@ static inline void lock_p(lock_t *lock) {
 
 //! @brief Release the given lock
 static inline void lock_v(lock_t *lock) {
-	assert(lock_test(lock));
 	#ifdef HLS
+	assert(lock_test(lock));
 	*lock = 0;
 	#else
-	pthread_mutex_unlock(lock);
+	assert(pthread_mutex_unlock(lock) == 0);
 	#endif
 }
 

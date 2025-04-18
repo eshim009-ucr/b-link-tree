@@ -11,10 +11,11 @@ LDLIBS=-lgtest -lpthread
 
 all: test
 
+main.o: main.cpp $(wildcard tests/*.hpp)
+
 %.o: %.c
 	$(CC) -c $(CFLAGS) -o $@ $<
-
-main.o: main.cpp $(wildcard tests/*.hpp)
+%.o: %.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
 test: $(OBJ)

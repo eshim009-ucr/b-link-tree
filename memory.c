@@ -24,12 +24,10 @@ Node mem_read_lock(bptr_t address, Node *memory) {
 	assert(address < MEM_SIZE);
 	lock_p(&local_readlock);
 	// Read the given address from main memory until its lock is released
+	// Then grab the lock
 	do {
 		tmp = memory[address];
-	} while(lock_test(&tmp.lock));
-	// After the lock is released, we can safely acquire it because no other
-	// modules concurrently hold this function's lock
-	lock_p(&tmp.lock);
+	} while(test_and_set(&tmp.lock) != 0);
 	// Write back the locked value to main memory
 	memory[address] = tmp;
 	// Release the local lock for future writers
