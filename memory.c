@@ -22,12 +22,17 @@ Node mem_read_lock(bptr_t address, Node *memory) {
 	Node tmp;
 
 	assert(address < MEM_SIZE);
-	lock_p(&local_readlock);
 	// Read the given address from main memory until its lock is released
 	// Then grab the lock
 	do {
+		lock_p(&local_readlock);
 		tmp = memory[address];
-	} while(test_and_set(&tmp.lock) != 0);
+		if (test_and_set(&tmp.lock) == 0) {
+			break;
+		} else {
+			lock_v(&local_readlock);
+		}
+	} while(true);
 	// Write back the locked value to main memory
 	memory[address] = tmp;
 	// Release the local lock for future writers
