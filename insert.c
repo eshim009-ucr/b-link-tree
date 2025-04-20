@@ -5,6 +5,7 @@
 #include "split.h"
 #include "tree-helpers.h"
 #include <string.h>
+#include <stdio.h>
 
 
 ErrorCode insert(bptr_t *root, bkey_t key, bval_t value, Node *memory) {
@@ -22,7 +23,9 @@ ErrorCode insert(bptr_t *root, bkey_t key, bval_t value, Node *memory) {
 	// Load leaf
 	i_leaf = get_leaf_idx(lineage);
 	leaf.addr = lineage[i_leaf];
+	printf("[insert.c] Waiting to lock mem[%02d]\n", leaf.addr); fflush(stdout);
 	leaf.node = mem_read_lock(leaf.addr, memory);
+	printf("[insert.c] Got lock for mem[%02d]\n", leaf.addr); fflush(stdout);
 	do {
 		// Load this node's parent, if it exists
 		if (i_leaf > 0) {

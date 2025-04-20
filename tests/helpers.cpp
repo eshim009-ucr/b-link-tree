@@ -50,3 +50,8 @@ void check_inserted_leaves() {
 		node.addr = node.node.next;
 	}
 }
+
+
+void *timeout_fail(void *argv) {
+	uint_fast32_t args = *(uint_fast32_t *)argv;
+}

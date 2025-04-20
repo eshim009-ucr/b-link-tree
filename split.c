@@ -2,6 +2,7 @@
 #include "memory.h"
 #include "node.h"
 #include <string.h>
+#include <stdio.h>
 
 
 //! @brief Divide by 2 and take the ceiling using only integer arithmetic
@@ -29,15 +30,17 @@ static ErrorCode alloc_sibling(
 	Node *memory
 ) {
 	const uint_fast8_t level = get_level(leaf->addr);
+	ErrorCode status;
 
 	// Find an empty spot for the new leaf
 	for (sibling->addr = level * MAX_NODES_PER_LEVEL;
 		sibling->addr < (level+1) * MAX_NODES_PER_LEVEL;
 		++sibling->addr) {
 		// Found an empty slot
-		if (leaf->addr != sibling->addr
-			&& mem_read(sibling->addr, memory).keys[0] == INVALID) {
-			break;
+		if (leaf->addr != sibling->addr) {
+			printf("[split.c] Trying lock for mem[%02d]\n", sibling->addr); fflush(stdout);
+			sibling->node = mem_read_trylock(sibling->addr, memory, &status);
+			if (status == SUCCESS && sibling->node.keys[0] == INVALID) break;
 		}
 	}
 	// If we didn't break, we didn't find an empty slot
@@ -45,7 +48,7 @@ static ErrorCode alloc_sibling(
 		sibling->addr = INVALID;
 		return OUT_OF_MEMORY;
 	}
-	sibling->node = mem_read_lock(sibling->addr, memory);
+	printf("[split.c] Got lock for mem[%02d]\n", sibling->addr); fflush(stdout);
 	// Adjust next node pointers
 	sibling->node.next = leaf->node.next;
 	leaf->node.next = sibling->addr;

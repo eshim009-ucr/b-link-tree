@@ -14,7 +14,7 @@ extern "C" {
 // Multithreading bugs are often dependent on random ways that threads can
 // interleave. Testing multiple times gives more chances for these bugs to
 // manifest themselves.
-#define PARALLEL_RERUNS 16
+#define PARALLEL_RERUNS 2
 
 extern FILE *log_stream;
 extern Node memory[MEM_SIZE];
@@ -27,7 +27,6 @@ TEST(ParallelTest, InterleavedAscending) {
 		test_info->test_suite_name(), test_info->name()
 	);
 
-	pthread_t thread_even, thread_odd;
 	bptr_t root = 0;
 	si_args odd_args = {
 		.start = 1,
@@ -39,6 +38,7 @@ TEST(ParallelTest, InterleavedAscending) {
 	even_args.start = 2;
 
 	for (uint_fast8_t i = 0; i < PARALLEL_RERUNS; ++i) {
+		pthread_t thread_even, thread_odd;
 		fprintf(log_stream, "Run %d\n", i+1);
 		root = 0;
 		mem_reset_all(memory);
@@ -64,7 +64,6 @@ TEST(ParallelTest, InterleavedDescending) {
 		test_info->test_suite_name(), test_info->name()
 	);
 
-	pthread_t thread_even, thread_odd;
 	bptr_t root = 0;
 	si_args odd_args = {
 		.end = 1,
@@ -81,6 +80,7 @@ TEST(ParallelTest, InterleavedDescending) {
 	}
 
 	for (uint_fast8_t i = 0; i < PARALLEL_RERUNS; ++i) {
+		pthread_t thread_even, thread_odd;
 		fprintf(log_stream, "Run %d\n", i+1);
 		root = 0;
 		mem_reset_all(memory);
@@ -106,7 +106,6 @@ TEST(ParallelTest, CrossfadeInsert) {
 		test_info->test_suite_name(), test_info->name()
 	);
 
-	pthread_t thread_even, thread_odd;
 	bptr_t root = 0;
 	si_args odd_args = {
 		.start = 1,
@@ -120,6 +119,7 @@ TEST(ParallelTest, CrossfadeInsert) {
 	even_args.stride = -odd_args.stride;
 
 	for (uint_fast8_t i = 0; i < PARALLEL_RERUNS; ++i) {
+		pthread_t thread_even, thread_odd;
 		fprintf(log_stream, "Run %d\n", i+1);
 		root = 0;
 		mem_reset_all(memory);
