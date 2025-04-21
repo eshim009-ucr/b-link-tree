@@ -54,4 +54,6 @@ void check_inserted_leaves() {
 
 void *timeout_fail(void *argv) {
 	uint_fast32_t args = *(uint_fast32_t *)argv;
+	sleep(args);
+	pthread_exit(NULL);
 }
