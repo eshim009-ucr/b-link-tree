@@ -28,11 +28,15 @@ static inline bool test_and_set(lock_t *lock) {
 }
 
 static inline bool lock_test(lock_t const *lock) {
+	#ifndef HLS
 	lock_t unset = LOCK_INIT;
 	//! @warning This should work in most cases, but allegedly technically if
 	//! the system's lock type is padded, then theoretically the padding may not
 	//! be equal and cause an incorrect return of true
 	return memcmp(lock, &unset, sizeof(lock_t));
+	#else
+	return *lock == LOCK_INIT;
+	#endif
 }
 
 

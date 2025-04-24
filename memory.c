@@ -59,7 +59,16 @@ void mem_write_unlock(AddrNode *node, Node *memory) {
 
 void mem_unlock(bptr_t address, Node *memory) {
 	assert(address < MEM_SIZE);
-	lock_v(&memory[address].lock);
+	// Cast byte pointer to lock_t pointer to ensure write is of correct size
+	*((lock_t*) (
+		// Byte pointer
+		&(
+			(uint8_t*) memory
+		)[
+			// Address of the lock field of the node who starts at address
+			(address+1)*sizeof(Node)-sizeof(lock_t)
+		]
+	)) = LOCK_INIT;
 }
 
 void mem_reset_all(Node *memory) {
