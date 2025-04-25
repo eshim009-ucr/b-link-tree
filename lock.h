@@ -29,7 +29,7 @@ static inline bool test_and_set(lock_t *lock) {
 
 static inline bool lock_test(lock_t const *lock) {
 	#if defined(HLS) || defined(FPGA)
-	return *lock == LOCK_INIT;
+	return *lock != LOCK_INIT;
 	#else
 	lock_t unset = LOCK_INIT;
 	//! @warning This should work in most cases, but allegedly technically if
