@@ -18,18 +18,21 @@ Node mem_read(bptr_t address, Node const *memory) {
 //! @todo Set up multiple locks for specific regions of memory, such as by
 //! address ranges or hashes to allow higher write bandwidth.
 Node mem_read_lock(bptr_t address, Node *memory) {
-	static lock_t local_readlock = 0;
+	static lock_t local_readlock = LOCK_INIT;
 	Node tmp;
 
 	assert(address < MEM_SIZE);
-	lock_p(&local_readlock);
 	// Read the given address from main memory until its lock is released
+	// Then grab the lock
 	do {
+		lock_p(&local_readlock);
 		tmp = memory[address];
-	} while(lock_test(&tmp.lock));
-	// After the lock is released, we can safely acquire it because no other
-	// modules concurrently hold this function's lock
-	lock_p(&tmp.lock);
+		if (test_and_set(&tmp.lock) == 0) {
+			break;
+		} else {
+			lock_v(&local_readlock);
+		}
+	} while(true);
 	// Write back the locked value to main memory
 	memory[address] = tmp;
 	// Release the local lock for future writers
@@ -45,16 +48,25 @@ void mem_write_unlock(AddrNode *node, Node *memory) {
 
 void mem_unlock(bptr_t address, Node *memory) {
 	assert(address < MEM_SIZE);
-	lock_v(&memory[address].lock);
+	// Cast byte pointer to lock_t pointer to ensure write is of correct size
+	*((lock_t*) (
+		// Byte pointer
+		&(
+			(uint8_t*) memory
+		)[
+			// Address of the lock field of the node who starts at address
+			(address+1)*sizeof(Node)-sizeof(lock_t)
+		]
+	)) = LOCK_INIT;
 }
 
 void mem_reset_all(Node *memory) {
 	memset(memory, INVALID, MEM_SIZE*sizeof(Node));
 	for (bptr_t i = 0; i < MEM_SIZE; i++) {
-		init_lock(&memory[i].lock);
+		memory[i].lock = LOCK_INIT;
 	}
 }
 
-bptr_t ptr_to_addr(void *ptr, Node const *memory) {
+bptr_t ptr_to_addr(void const *ptr, Node const *memory) {
 	return (ptr - (void *) memory) / sizeof(Node);
 }

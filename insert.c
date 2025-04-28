@@ -44,7 +44,7 @@ ErrorCode insert(bptr_t *root, bkey_t key, bval_t value, Node *memory) {
 			// Unrecoverable failure
 			if (status != SUCCESS && status != PARENT_FULL) {
 				mem_unlock(leaf.addr, memory);
-				mem_unlock(sibling.addr, memory);
+				if (sibling.addr != INVALID) mem_unlock(sibling.addr, memory);
 				mem_unlock(parent.addr, memory);
 				return status;
 			}
