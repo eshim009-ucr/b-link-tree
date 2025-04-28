@@ -32,7 +32,7 @@ struct Node {
 	//! @brief Used to restrict concurrent modifications to this node
 	lock_t lock;
 }
-#ifdef HLS
+#ifdef FPGA
 __attribute__((packed))
 #endif
 ;
@@ -61,7 +61,7 @@ struct AddrNode {
 	Node node;
 	bptr_t addr;
 }
-#ifdef HLS
+#ifdef FPGA
 __attribute__((packed))
 #endif
 ;
