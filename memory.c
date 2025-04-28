@@ -66,7 +66,3 @@ void mem_reset_all(Node *memory) {
 		memory[i].lock = LOCK_INIT;
 	}
 }
-
-bptr_t ptr_to_addr(void const *ptr, Node const *memory) {
-	return (ptr - (void *) memory) / sizeof(Node);
-}

@@ -30,7 +30,5 @@ void mem_unlock(bptr_t address, Node *memory);
 //! All data is 1s except for locks
 void mem_reset_all(Node *memory);
 
-bptr_t ptr_to_addr(void const *ptr, Node const *memory);
-
 
 #endif

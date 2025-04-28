@@ -48,7 +48,7 @@ TEST(ParallelTest, InterleavedAscending) {
 		pthread_join(thread_even, NULL);
 		pthread_join(thread_odd, NULL);
 
-		dump_node_list(log_stream, root, memory);
+		dump_node_list(log_stream, memory);
 
 		check_inserted_leaves();
 
@@ -90,7 +90,7 @@ TEST(ParallelTest, InterleavedDescending) {
 		pthread_join(thread_even, NULL);
 		pthread_join(thread_odd, NULL);
 
-		dump_node_list(log_stream, root, memory);
+		dump_node_list(log_stream, memory);
 
 		check_inserted_leaves();
 
@@ -129,7 +129,7 @@ TEST(ParallelTest, CrossfadeInsert) {
 		pthread_join(thread_even, NULL);
 		pthread_join(thread_odd, NULL);
 
-		dump_node_list(log_stream, root, memory);
+		dump_node_list(log_stream, memory);
 
 		check_inserted_leaves();
 

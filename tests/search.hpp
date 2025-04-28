@@ -34,7 +34,7 @@ TEST(SearchTest, RootIsLeaf) {
 	root.node.keys[2] = 4; root.node.values[2].data = -4;
 	root.node.keys[3] = 5; root.node.values[3].data = -5;
 	mem_write_unlock(&root, memory);
-	dump_node_list(log_stream, root.addr, memory);
+	dump_node_list(log_stream, memory);
 	EXPECT_EQ(search(root.addr, 0, memory).status, NOT_FOUND);
 	EXPECT_EQ(search(root.addr, 3, memory).status, NOT_FOUND);
 	EXPECT_EQ(search(root.addr, 6, memory).status, NOT_FOUND);
@@ -87,7 +87,7 @@ TEST(SearchTest, OneInternal) {
 	mem_write_unlock(&root, memory);
 	mem_write_unlock(&lchild, memory);
 	mem_write_unlock(&rchild, memory);
-	dump_node_list(log_stream, root.addr, memory);
+	dump_node_list(log_stream, memory);
 	EXPECT_EQ(search(root.addr, 0, memory).status, NOT_FOUND);
 	EXPECT_EQ(search(root.addr, 3, memory).status, NOT_FOUND);
 	EXPECT_EQ(search(root.addr, 6, memory).status, NOT_FOUND);
