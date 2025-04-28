@@ -36,11 +36,14 @@ typedef uint_fast32_t li_t;
 	X(OUT_OF_MEMORY, 5) \
 	X(PARENT_FULL, 6)
 //! @brief Status codes returned from tree functions
-typedef enum {
+enum {
 #define X(codename, codeval) codename = codeval,
 ERROR_CODE_XMACRO
 #undef X
-} ErrorCode;
+};
+//! HLS has a bad habit of mangling enums,
+//! so this is needed to prevent getting junk values
+typedef uint_least8_t ErrorCode;
 //! @brief Names of status codes, used for error messages
 static const char *const ERROR_CODE_NAMES[] = {
 #define X(codename, codeval) #codename,
@@ -49,7 +52,7 @@ ERROR_CODE_XMACRO
 };
 //! @brief Result of an operation returning a value and a return code
 typedef struct {
-	uint_least8_t status;
+	ErrorCode status;
 	bval_t value;
 } bstatusval_t;
 
