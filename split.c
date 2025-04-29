@@ -16,6 +16,42 @@ inline static void init_node(Node *node) {
 	memset(node->keys, INVALID, TREE_ORDER * sizeof(bkey_t));
 }
 
+#ifdef STACK_ALLOC
+static ErrorCode alloc_node(bptr_t *addr, Node const *memory) {
+	//! TODO Make thread-safe
+	static bptr_t shared_top = 1;
+	bptr_t top = shared_top;
+	bool found = false;
+	for (*addr = top; *addr < MEM_SIZE; ++*addr) {
+		// Found an empty slot
+		if (mem_read(*addr, memory).keys[0] == INVALID) {
+			found = true;
+			break;
+		}
+	}
+	// If we didn't break, we didn't find an empty slot
+	// Look for gaps in previous memory space
+	if (!found) {
+		for (*addr = 0; *addr < top; ++*addr) {
+			// Found an empty slot
+			if (mem_read(*addr, memory).keys[0] == INVALID) {
+				found = true;
+				break;
+			}
+		}
+		// Give up, no space for real
+		if (!found) {
+			*addr = INVALID;
+			return OUT_OF_MEMORY;
+		}
+	}
+	// Not guaranteed to be accurate, but being +/- a bit isn't a dealbreak
+	shared_top++;
+	return SUCCESS;
+}
+#endif
+
+
 //! @brief Allocate a new sibling node in an empty slot in main mameory
 //!
 //! Acquires a lock on the sibling node
@@ -28,6 +64,10 @@ static ErrorCode alloc_sibling(
 	AddrNode *sibling,
 	Node *memory
 ) {
+#ifdef STACK_ALLOC
+	ErrorCode status = alloc_node(&sibling->addr, memory);
+	if (status != SUCCESS) return status;
+#else
 	const uint_fast8_t level = get_level(leaf->addr);
 
 	// Find an empty spot for the new leaf
@@ -45,6 +85,7 @@ static ErrorCode alloc_sibling(
 		sibling->addr = INVALID;
 		return OUT_OF_MEMORY;
 	}
+#endif
 	sibling->node = mem_read_lock(sibling->addr, memory);
 	// Adjust next node pointers
 	sibling->node.next = leaf->node.next;
@@ -74,6 +115,10 @@ static ErrorCode split_root(
 	AddrNode const *sibling,
 	Node *memory
 ) {
+#ifdef STACK_ALLOC
+	ErrorCode status = alloc_node(root, memory);
+	if (status != SUCCESS) return status;
+#else
 	// If this is the only node
 	// We need to create the first inner node
 	if (is_leaf(leaf->addr)) {
@@ -86,6 +131,7 @@ static ErrorCode split_root(
 			*root = *root + MAX_NODES_PER_LEVEL;
 		}
 	}
+#endif
 	parent->addr = *root;
 	parent->node = mem_read_lock(parent->addr, memory);
 	init_node(&parent->node);
