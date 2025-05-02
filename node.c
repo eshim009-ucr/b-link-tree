@@ -31,6 +31,7 @@ bstatusval_t find_next(Node const *n, bkey_t key) {
 		// so the key is greater than any current tree value
 		result.value = n->values[TREE_ORDER-1];
 	} else {
+		result.status = PARENT_FULL;
 		result.value.ptr = n->next;
 	}
 	return result;

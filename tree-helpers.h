@@ -4,6 +4,8 @@
 
 #include "types.h"
 
+#define LINEAGE_SIZE (MAX_LEVELS)
+
 typedef struct Node Node;
 
 
@@ -11,7 +13,7 @@ typedef struct Node Node;
 //! @param[in] lineage  An existing array of a node's parents up until the root
 //! @return Index of the leaf within the lineage array
 inline static uint_fast8_t get_leaf_idx(bptr_t const *lineage) {
-	for (uint_fast8_t i = MAX_LEVELS-1; i > 0; i--) {
+	for (uint_fast8_t i = LINEAGE_SIZE-1; i > 0; i--) {
 		if (lineage[i] != INVALID) return i;
 	}
 	return 0;

@@ -11,16 +11,17 @@ ErrorCode insert(bptr_t *root, bkey_t key, bval_t value, Node *memory) {
 	ErrorCode status;
 	li_t i_leaf;
 	AddrNode leaf, parent, sibling;
-	bptr_t lineage[MAX_LEVELS];
+	bptr_t lineage[LINEAGE_SIZE];
 	bool keep_splitting = false;
 
 	// Initialize lineage array
-	memset(lineage, INVALID, MAX_LEVELS*sizeof(bptr_t));
+	memset(lineage, INVALID, LINEAGE_SIZE*sizeof(bptr_t));
 	// Try to trace lineage
 	status = trace_lineage(*root, key, lineage, memory);
 	if (status != SUCCESS) return status;
 	// Load leaf
 	i_leaf = get_leaf_idx(lineage);
+	if (!is_leaf(lineage[i_leaf])) return OUT_OF_MEMORY;
 	leaf.addr = lineage[i_leaf];
 	leaf.node = mem_read_lock(leaf.addr, memory);
 	do {

@@ -17,12 +17,15 @@ inline static void init_node(Node *node) {
 }
 
 #ifdef STACK_ALLOC
-static ErrorCode alloc_node(bptr_t *addr, Node const *memory) {
+static ErrorCode alloc_node(bptr_t *addr, bool leaf, Node const *memory) {
 	//! TODO Make thread-safe
-	static bptr_t shared_top = 1;
-	bptr_t top = shared_top;
+	static bptr_t leaf_top_shared = 1;
+	static bptr_t internal_top_shared = MAX_LEAVES+1;
+	bptr_t top = leaf ? leaf_top_shared : internal_top_shared;
+	const bptr_t min_addr = leaf ? 0 : MAX_LEAVES;
+	const bptr_t max_addr = leaf ? MAX_LEAVES : MEM_SIZE;
 	bool found = false;
-	for (*addr = top; *addr < MEM_SIZE; ++*addr) {
+	for (*addr = top; *addr < max_addr; ++*addr) {
 		// Found an empty slot
 		if (mem_read(*addr, memory).keys[0] == INVALID) {
 			found = true;
@@ -32,7 +35,7 @@ static ErrorCode alloc_node(bptr_t *addr, Node const *memory) {
 	// If we didn't break, we didn't find an empty slot
 	// Look for gaps in previous memory space
 	if (!found) {
-		for (*addr = 0; *addr < top; ++*addr) {
+		for (*addr = min_addr; *addr < top; ++*addr) {
 			// Found an empty slot
 			if (mem_read(*addr, memory).keys[0] == INVALID) {
 				found = true;
@@ -46,7 +49,8 @@ static ErrorCode alloc_node(bptr_t *addr, Node const *memory) {
 		}
 	}
 	// Not guaranteed to be accurate, but being +/- a bit isn't a dealbreak
-	shared_top++;
+	if (is_leaf(*addr)) leaf_top_shared++;
+	else internal_top_shared++;
 	return SUCCESS;
 }
 #endif
@@ -65,7 +69,7 @@ static ErrorCode alloc_sibling(
 	Node *memory
 ) {
 #ifdef STACK_ALLOC
-	ErrorCode status = alloc_node(&sibling->addr, memory);
+	ErrorCode status = alloc_node(&sibling->addr, is_leaf(leaf->addr), memory);
 	if (status != SUCCESS) return status;
 #else
 	const uint_fast8_t level = get_level(leaf->addr);
@@ -115,23 +119,23 @@ static ErrorCode split_root(
 	AddrNode const *sibling,
 	Node *memory
 ) {
-#ifdef STACK_ALLOC
-	ErrorCode status = alloc_node(root, memory);
-	if (status != SUCCESS) return status;
-#else
 	// If this is the only node
 	// We need to create the first inner node
 	if (is_leaf(leaf->addr)) {
 		// Make a new root node
 		*root = MAX_LEAVES;
 	} else {
+#ifdef STACK_ALLOC
+		ErrorCode status = alloc_node(root, is_leaf(leaf->addr), memory);
+		if (status != SUCCESS) return status;
+#else
 		if (*root + MAX_NODES_PER_LEVEL >= MEM_SIZE) {
 			return OUT_OF_MEMORY;
 		} else {
 			*root = *root + MAX_NODES_PER_LEVEL;
 		}
-	}
 #endif
+	}
 	parent->addr = *root;
 	parent->node = mem_read_lock(parent->addr, memory);
 	init_node(&parent->node);

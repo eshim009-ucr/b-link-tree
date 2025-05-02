@@ -59,6 +59,24 @@ void dump_values(FILE *stream, Node const *node) {
 
 void dump_node_list(FILE *stream, Node const *memory) {
 	Node n;
+	#ifdef STACK_ALLOC
+	uint_fast16_t i, r;
+	fprintf(stream, "LEAVES");
+	for (r = 0; r < MEM_SIZE; r += 8) {
+		fprintf(stream, "\n%2u ", r);
+		for (i = 0; i < 8 && r+i<MEM_SIZE; ++i) {
+			n = mem_read(r+i, memory);
+			dump_keys(stream, &n);
+		}
+		fprintf(stream, "\n   ");
+		for (i = 0; i < 8 && r+i<MEM_SIZE; ++i) {
+			n = mem_read(r+i, memory);
+			dump_values(stream, &n);
+		}
+		fprintf(stream, "\n");
+		if (r+8 == MAX_LEAVES) fprintf(stream, "INTERNAL NODES");
+	}
+	#else
 	uint_fast16_t i, r, c;
 	fprintf(stream, "LEAVES\n%2u ", 0);
 	for (i = 0; i < MAX_LEAVES; ++i) {
@@ -88,6 +106,7 @@ void dump_node_list(FILE *stream, Node const *memory) {
 		}
 		fprintf(stream, "\n");
 	}
+	#endif
 	fprintf(stream, "\n");
 	fflush(stream);
 }
