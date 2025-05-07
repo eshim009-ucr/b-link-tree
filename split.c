@@ -53,6 +53,24 @@ static ErrorCode alloc_node(bptr_t *addr, bool leaf, Node const *memory) {
 	else internal_top_shared++;
 	return SUCCESS;
 }
+#else
+static ErrorCode alloc_node(bptr_t *addr, uint_fast8_t level, Node const *memory) {
+	// Find an empty spot for the new leaf
+	for (*addr = level * MAX_NODES_PER_LEVEL;
+		*addr < (level+1) * MAX_NODES_PER_LEVEL;
+		*addr) {
+		// Found an empty slot
+		if (mem_read(*addr, memory).keys[0] == INVALID) {
+			break;
+		}
+	}
+	// If we didn't break, we didn't find an empty slot
+	if (*addr == (level+1) * MAX_NODES_PER_LEVEL) {
+		*addr = INVALID;
+		return OUT_OF_MEMORY;
+	}
+	return SUCCESS;
+}
 #endif
 
 
@@ -68,28 +86,16 @@ static ErrorCode alloc_sibling(
 	AddrNode *sibling,
 	Node *memory
 ) {
-#ifdef STACK_ALLOC
-	ErrorCode status = alloc_node(&sibling->addr, is_leaf(leaf->addr), memory);
+	ErrorCode status = alloc_node(
+		&sibling->addr,
+		#ifdef STACK_ALLOC
+		is_leaf(leaf->addr),
+		#else
+		get_level(leaf->addr),
+		#endif
+		memory
+	);
 	if (status != SUCCESS) return status;
-#else
-	const uint_fast8_t level = get_level(leaf->addr);
-
-	// Find an empty spot for the new leaf
-	for (sibling->addr = level * MAX_NODES_PER_LEVEL;
-		sibling->addr < (level+1) * MAX_NODES_PER_LEVEL;
-		++sibling->addr) {
-		// Found an empty slot
-		if (leaf->addr != sibling->addr
-			&& mem_read(sibling->addr, memory).keys[0] == INVALID) {
-			break;
-		}
-	}
-	// If we didn't break, we didn't find an empty slot
-	if (sibling->addr == (level+1) * MAX_NODES_PER_LEVEL) {
-		sibling->addr = INVALID;
-		return OUT_OF_MEMORY;
-	}
-#endif
 	sibling->node = mem_read_lock(sibling->addr, memory);
 	// Adjust next node pointers
 	sibling->node.next = leaf->node.next;
