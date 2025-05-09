@@ -44,11 +44,13 @@ ErrorCode insert_after_split(
 	ErrorCode status;
 	if (key < max(&leaf->node)) {
 		status = insert_nonfull(&leaf->node, key, value);
+		mem_write_unlock(leaf, memory);
+		mem_unlock(sibling->addr, memory);
 	} else {
 		status = insert_nonfull(&sibling->node, key, value);
+		mem_unlock(leaf->addr, memory);
+		mem_write_unlock(sibling, memory);
 	}
-	mem_write_unlock(sibling, memory);
-	mem_write_unlock(leaf, memory);
 	return status;
 }
 
