@@ -14,7 +14,9 @@ extern "C" {
 // Multithreading bugs are often dependent on random ways that threads can
 // interleave. Testing multiple times gives more chances for these bugs to
 // manifest themselves.
-#define PARALLEL_RERUNS 16
+#ifndef PARALLEL_RERUNS
+#define PARALLEL_RERUNS 1024
+#endif
 
 extern FILE *log_stream;
 extern Node memory[MEM_SIZE];
@@ -47,12 +49,14 @@ TEST(ParallelTest, InterleavedAscending) {
 		pthread_create(&thread_odd, NULL, stride_insert, (void*) &odd_args);
 		pthread_join(thread_even, NULL);
 		pthread_join(thread_odd, NULL);
+		ASSERT_TRUE(even_args.pass);
+		ASSERT_TRUE(odd_args.pass);
 
 		dump_node_list(log_stream, memory);
 
-		check_inserted_leaves();
+		ASSERT_TRUE(check_inserted_leaves());
 
-		EXPECT_TRUE(validate(root, log_stream, memory));
+		ASSERT_TRUE(validate(root, log_stream, memory));
 	}
 	fprintf(log_stream, "\n\n");
 }
@@ -89,12 +93,14 @@ TEST(ParallelTest, InterleavedDescending) {
 		pthread_create(&thread_odd, NULL, stride_insert, (void*) &odd_args);
 		pthread_join(thread_even, NULL);
 		pthread_join(thread_odd, NULL);
+		ASSERT_TRUE(even_args.pass);
+		ASSERT_TRUE(odd_args.pass);
 
 		dump_node_list(log_stream, memory);
 
-		check_inserted_leaves();
+		ASSERT_TRUE(check_inserted_leaves());
 
-		EXPECT_TRUE(validate(root, log_stream, memory));
+		ASSERT_TRUE(validate(root, log_stream, memory));
 	}
 	fprintf(log_stream, "\n\n");
 }
@@ -128,12 +134,14 @@ TEST(ParallelTest, CrossfadeInsert) {
 		pthread_create(&thread_odd, NULL, stride_insert, (void*) &odd_args);
 		pthread_join(thread_even, NULL);
 		pthread_join(thread_odd, NULL);
+		ASSERT_TRUE(even_args.pass);
+		ASSERT_TRUE(odd_args.pass);
 
 		dump_node_list(log_stream, memory);
 
-		check_inserted_leaves();
+		ASSERT_TRUE(check_inserted_leaves());
 
-		EXPECT_TRUE(validate(root, log_stream, memory));
+		ASSERT_TRUE(validate(root, log_stream, memory));
 	}
 	fprintf(log_stream, "\n\n");
 }

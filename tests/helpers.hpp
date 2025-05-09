@@ -19,6 +19,9 @@ struct si_args {
 	int_fast32_t stride;
 	//! Pointer to the tree root
 	bptr_t *root;
+	//! Set by the thread, read up on return.
+	//! False if an insertion error has occurred, true otherwise.
+	bool pass;
 };
 
 
@@ -33,11 +36,12 @@ extern Node memory[MEM_SIZE];
 //! Keys are have values of 1 <= key <= n, Values are assigned to -1 times their
 //! key
 void *stride_insert(void *argv);
-//! @brief Check after insertion of keys with GoogleTest assertions
+//! @brief Check leaf linked list correctncess after insertion of keys
 //!
 //! Keys are have values of 1 <= key <= n,
 //! Values are assigned to -1 times their key
-void check_inserted_leaves();
+//! @return true if pass, false otherwise
+bool check_inserted_leaves();
 
 
 #endif
