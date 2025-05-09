@@ -4,9 +4,9 @@ SRC=$(SRC_C) $(SRC_CPP)
 OBJ_C=$(subst .c,.o,$(SRC_C))
 OBJ_CPP=$(subst .cpp,.o,$(SRC_CPP))
 OBJ=$(OBJ_C) $(OBJ_CPP)
-DEFS=-DSTACK_ALLOC
-CFLAGS=-Wall -std=c11 -g $(DEFS)
-CXXFLAGS=-Wall -std=c++14 -g $(DEFS)
+DEFS=STACK_ALLOC
+CFLAGS=-Wall -std=c11 -g $(addprefix -D,$(DEFS))
+CXXFLAGS=-Wall -std=c++14 -g $(addprefix -D,$(DEFS))
 LDLIBS=-lgtest -lpthread
 
 

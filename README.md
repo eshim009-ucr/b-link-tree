@@ -16,6 +16,28 @@ Compile-Time Options
 These options alter how the tree works in order to easily compare different
 implementations of the same abstract functionality.
 
+These are most easily set using the `DEFS` variable in the Makefile, which
+accepts a whitespace-delimited list of preprocessor definition names.
+
+#### `STACK_ALLOC`
+Use a stack-based approach to allocating new nodes instead of the default
+grid-based approach.
+
+The stack-based approach partitions available memory into a section for leaves
+and a section for inner nodes. Each section has a stack pointer that is moved up
+as nodes are allocated. When searching for an empty slot, this avoids
+re-checking many of the early-allocated slots that are very likely to be full.
+If an empty slot is not found between the top of the stack and the end of the
+memory section, the check loops back around to the start of the block to look
+for holes left by deleted nodes. This allows for faster node allocation at the
+cost of worse locality.
+
+The default grid-based approach views the tree as a rectangular matrix of node
+slots, where each row corresponds to a level of the tree. Using the default
+rectangular grid wastes slots at higher levels of the tree, but eventually I
+hope to implement a version that only allocates the necessary number of nodes
+per level.
+
 #### `UNLOCKED`
 This effectively disables all locking operations. This can be used to determine
 locking overhead or for debugging.
