@@ -15,8 +15,15 @@ Node mem_read(bptr_t address, Node const *memory);
 //! @brief Read a node from memory, locking it in memory
 Node mem_read_lock(bptr_t address, Node *memory);
 
+#ifdef OPTIMISTIC_LOCK
+#include <stdbool.h>
+//! @brief Write a node to memory and unlock it
+//! @return true on success, false on failure
+bool mem_write_unlock(AddrNode *node, Node *memory);
+#else
 //! @brief Write a node to memory and unlock it
 void mem_write_unlock(AddrNode *node, Node *memory);
+#endif
 
 //! @brief Unlock a node in memory
 //!

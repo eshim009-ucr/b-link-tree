@@ -18,6 +18,9 @@ Node mem_read(bptr_t address, Node const *memory) {
 //! @todo Set up multiple locks for specific regions of memory, such as by
 //! address ranges or hashes to allow higher write bandwidth.
 Node mem_read_lock(bptr_t address, Node *memory) {
+#ifdef OPTIMISTIC_LOCK
+	return memory[address];
+#else
 	static lock_t local_readlock = LOCK_INIT;
 	Node tmp;
 
@@ -38,15 +41,28 @@ Node mem_read_lock(bptr_t address, Node *memory) {
 	// Release the local lock for future writers
 	lock_v(&local_readlock);
 	return tmp;
+#endif
 }
 
+#ifdef OPTIMISTIC_LOCK
+bool mem_write_unlock(AddrNode *node, Node *memory) {
+	assert(node->addr < MEM_SIZE);
+	Node tmp = memory[node->addr];
+	if (tmp.lock != node->node.lock) return false;
+	node->node.lock++;
+	memory[node->addr] = node->node;
+	return true;
+}
+#else
 void mem_write_unlock(AddrNode *node, Node *memory) {
 	assert(node->addr < MEM_SIZE);
 	lock_v(&node->node.lock);
 	memory[node->addr] = node->node;
 }
+#endif
 
 void mem_unlock(bptr_t address, Node *memory) {
+#ifndef OPTIMISTIC_LOCK
 	assert(address < MEM_SIZE);
 	// Cast byte pointer to lock_t pointer to ensure write is of correct size
 	*((lock_t*) (
@@ -58,6 +74,7 @@ void mem_unlock(bptr_t address, Node *memory) {
 			(address+1)*sizeof(Node)-sizeof(lock_t)
 		]
 	)) = LOCK_INIT;
+#endif
 }
 
 void mem_reset_all(Node *memory) {

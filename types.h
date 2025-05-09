@@ -34,7 +34,9 @@ typedef uint_fast32_t li_t;
 	X(NOT_FOUND, 3) \
 	X(INVALID_ARGUMENT, 4) \
 	X(OUT_OF_MEMORY, 5) \
-	X(PARENT_FULL, 6)
+	X(PARENT_FULL, 6) \
+	X(RESTART, 7)
+#define MAX_ERR 7
 //! @brief Status codes returned from tree functions
 enum {
 #define X(codename, codeval) codename = codeval,

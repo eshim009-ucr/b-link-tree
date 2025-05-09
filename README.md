@@ -4,8 +4,8 @@ B-Link Tree
 This is a C implementation of a [B-Link tree][1] (a concurrent variant of the
 B+ tree) that uses fully static memory allocation. It is designed with the
 intent of being used as a component of an FPGA database accelerator built with
-Vitis HLS, but it can also be compiled and run as a standalone C program for
-a comparison benchmark or software-style testing and debugging to ensure
+[Vitis HLS][2], but it can also be compiled and run as a standalone C program
+for a comparison benchmark or software-style testing and debugging to ensure
 correctness.
 
 
@@ -15,6 +15,13 @@ Compile-Time Options
 ### User-Selectable
 These options alter how the tree works in order to easily compare different
 implementations of the same abstract functionality.
+
+#### `OPTIMISTIC_LOCK`
+Use [optimistic lock coupling][3] instead of traditional lock coupling. Instead
+of blocking access to contested data, the program ``optimistcally'' assumes that
+contention will never happens. Version numbers are used to detect modifications
+from other processes. If a version mismatch is detected, then the process will
+restart the operation.
 
 #### `UNLOCKED`
 This effectively disables all locking operations. This can be used to determine
@@ -45,3 +52,5 @@ This option is set automatically by the Vitis toolchain when running RTL
 generation. This is set during COSIM, but _not_ CSIM.
 
 [1]: https://doi.org/10.1145/319628.319663
+[2]: https://www.amd.com/en/products/software/adaptive-socs-and-fpgas/vitis/vitis-hls.html
+[3]: https://doi.org/10.1145/2933349.2933352

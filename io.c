@@ -23,11 +23,15 @@ void dump_keys(FILE *stream, Node const *node) {
 			fprintf(stream, ", ");
 		}
 	}
+	#ifdef OPTIMISTIC_LOCK
+	fprintf(stream, "; %3u] ", node->lock);
+	#else
 	if (lock_test(&node->lock)) {
 		fprintf(stream, "; LCK] ");
 	} else {
 		fprintf(stream, ";    ] ");
 	}
+	#endif
 }
 
 //! @brief Print values of a node in a human-readable format
