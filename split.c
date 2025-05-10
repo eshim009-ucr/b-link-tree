@@ -20,8 +20,6 @@ inline static void init_node(Node *node) {
 //!
 //! Acquires a lock on the sibling node
 static ErrorCode alloc_sibling(
-	//! [in] Root of the tree the nodes reside in
-	bptr_t const *root,
 	//! [in] The node to split
 	AddrNode *leaf,
 	//! [out] The contents of the split node's new sibling
@@ -103,8 +101,6 @@ static ErrorCode split_root(
 //! @return An error code representing the success or type of failure of the
 //!         operation
 static ErrorCode split_nonroot(
-	//! [in] Root of the tree the nodes reside in
-	bptr_t const *root,
 	//! [in] The node to split
 	AddrNode const *leaf,
 	//! [inout] The parent of the node to split
@@ -140,12 +136,12 @@ static ErrorCode split_nonroot(
 ErrorCode split_node(
 	bptr_t *root, AddrNode *leaf, AddrNode *parent, AddrNode *sibling, Node *memory
 ) {
-	ErrorCode status = alloc_sibling(root, leaf, sibling, memory);
+	ErrorCode status = alloc_sibling(leaf, sibling, memory);
 	if (status != SUCCESS) return status;
 	if (parent->addr == INVALID) {
 		status = split_root(root, leaf, parent, sibling, memory);
 	} else {
-		status = split_nonroot(root, leaf, parent, sibling);
+		status = split_nonroot(leaf, parent, sibling);
 	}
 	if (status == SUCCESS) {
 		mem_write_unlock(parent, memory);
