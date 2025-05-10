@@ -11,6 +11,7 @@ typedef struct Node Node;
 //! @param[in] lineage  An existing array of a node's parents up until the root
 //! @return Index of the leaf within the lineage array
 inline static uint_fast8_t get_leaf_idx(bptr_t const *lineage) {
+	get_leaf_idx_loop:
 	for (uint_fast8_t i = MAX_LEVELS-1; i > 0; i--) {
 		if (lineage[i] != INVALID) return i;
 	}

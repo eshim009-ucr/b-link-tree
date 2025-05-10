@@ -9,6 +9,7 @@ bstatusval_t search(bptr_t root, bkey_t key, Node const *memory) {
 	n.addr = root;
 
 	// Iterate until we hit a leaf
+	search_loop:
 	while (!is_leaf(n.addr)) {
 		n.node = mem_read(n.addr, memory);
 		result = find_next(&n.node, key);

@@ -31,6 +31,7 @@ static ErrorCode alloc_sibling(
 	const uint_fast8_t level = get_level(leaf->addr);
 
 	// Find an empty spot for the new leaf
+	find_empty_slot_loop:
 	for (sibling->addr = level * MAX_NODES_PER_LEVEL;
 		sibling->addr < (level+1) * MAX_NODES_PER_LEVEL;
 		++sibling->addr) {
@@ -50,6 +51,7 @@ static ErrorCode alloc_sibling(
 	sibling->node.next = leaf->node.next;
 	leaf->node.next = sibling->addr;
 	// Move half of old node's contents to new node
+	move_half_loop:
 	for (li_t i = 0; i < TREE_ORDER/2; ++i) {
 		sibling->node.keys[i] = leaf->node.keys[i + (TREE_ORDER/2)];
 		sibling->node.values[i] = leaf->node.values[i + (TREE_ORDER/2)];
@@ -113,11 +115,13 @@ static ErrorCode split_nonroot(
 	if (is_full(&parent->node)) {
 		return PARENT_FULL;
 	} else {
+		split_nonroot_key_loop:
 		for (li_t i = 0; i < TREE_ORDER; ++i) {
 			// Update key of old node
 			if (parent->node.values[i].ptr == leaf->addr) {
 				parent->node.keys[i] = leaf->node.keys[DIV2CEIL(TREE_ORDER)-1];
 				// Scoot over other nodes to fit in new node
+				split_scoot_nodes_loop:
 				for (li_t j = TREE_ORDER-1; j > i; --j) {
 					parent->node.keys[j] = parent->node.keys[j-1];
 					parent->node.values[j] = parent->node.values[j-1];

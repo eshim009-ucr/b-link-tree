@@ -4,6 +4,7 @@
 
 
 bkey_t max(Node const *node) {
+	node_max_loop:
 	for (li_t i = TREE_ORDER-1; i > 0; --i) {
 		if (node->keys[i] != INVALID) return node->keys[i];
 	}
@@ -14,12 +15,14 @@ bkey_t max(Node const *node) {
 ErrorCode insert_nonfull(Node *node, bkey_t key, bval_t value) {
 	li_t i_insert = 0;
 
+	insert_nonfull_key_loop:
 	for (li_t i = 0; i < TREE_ORDER; ++i) {
 		// Found an empty slot
 		// Will be the last slot
 		if (node->keys[i] == INVALID) {
 			// Scoot nodes if necessary to maintain ordering
 			// Iterate right to left from the last node to the insertion point
+			simple_scoot_nodes_loop:
 			for (; i_insert < i; i--) {
 				node->keys[i] = node->keys[i-1];
 				node->values[i] = node->values[i-1];
@@ -54,6 +57,7 @@ ErrorCode insert_after_split(
 
 
 ErrorCode rekey(Node *node, bkey_t old_key, bkey_t new_key) {
+	rekey_loop:
 	for (li_t i = 0; i < TREE_ORDER; ++i) {
 		if (node->keys[i] == old_key) {
 			node->keys[i] = new_key;

@@ -18,6 +18,7 @@ ErrorCode trace_lineage(bptr_t root, bkey_t key, bptr_t *lineage, Node const *me
 	bstatusval_t result;
 
 	// Iterate until we hit a leaf
+	trace_lineage_loop:
 	while (!is_leaf(lineage[curr])) {
 		node = mem_read(lineage[curr], memory);
 		result = find_next(&node, key);
