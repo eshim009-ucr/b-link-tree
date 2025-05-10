@@ -13,7 +13,7 @@ bstatusval_t search(bptr_t root, bkey_t key, Node const *memory) {
 		n.node = mem_read(n.addr, memory);
 		result = find_next(&n.node, key);
 		if (result.status != SUCCESS) return result;
-		n.addr = result.value.ptr;
+		n.addr = result.value;
 	}
 
 	// Search within the leaf node of the lineage for the key

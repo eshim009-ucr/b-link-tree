@@ -42,7 +42,7 @@ void dump_values(FILE *stream, Node const *node) {
 		if (node->keys[i] == INVALID) {
 			fprintf(stream, "   ");
 		} else {
-			fprintf(stream, "%3d", node->values[i].data);
+			fprintf(stream, "%3d", node->values[i]);
 		}
 		if (i < TREE_ORDER-1) {
 			fprintf(stream, ", ");

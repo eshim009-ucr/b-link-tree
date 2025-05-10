@@ -90,9 +90,9 @@ static ErrorCode split_root(
 	parent->node = mem_read_lock(parent->addr, memory);
 	init_node(&parent->node);
 	parent->node.keys[0] = leaf->node.keys[DIV2CEIL(TREE_ORDER)-1];
-	parent->node.values[0].ptr = leaf->addr;
+	parent->node.values[0] = leaf->addr;
 	parent->node.keys[1] = sibling->node.keys[(TREE_ORDER/2)-1];
-	parent->node.values[1].ptr = sibling->addr;
+	parent->node.values[1] = sibling->addr;
 	return SUCCESS;
 }
 
@@ -115,7 +115,7 @@ static ErrorCode split_nonroot(
 	} else {
 		for (li_t i = 0; i < TREE_ORDER; ++i) {
 			// Update key of old node
-			if (parent->node.values[i].ptr == leaf->addr) {
+			if (parent->node.values[i] == leaf->addr) {
 				parent->node.keys[i] = leaf->node.keys[DIV2CEIL(TREE_ORDER)-1];
 				// Scoot over other nodes to fit in new node
 				for (li_t j = TREE_ORDER-1; j > i; --j) {
@@ -124,7 +124,7 @@ static ErrorCode split_nonroot(
 				}
 				// Insert new node
 				parent->node.keys[i+1] = sibling->node.keys[(TREE_ORDER/2)-1];
-				parent->node.values[i+1].ptr = sibling->addr;
+				parent->node.values[i+1] = sibling->addr;
 				return SUCCESS;
 			}
 		}

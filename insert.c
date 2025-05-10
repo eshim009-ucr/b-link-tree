@@ -54,7 +54,7 @@ ErrorCode insert(bptr_t *root, bkey_t key, bval_t value, Node *memory) {
 				// Try this again on the parent
 				key = max(&sibling.node);
 				rekey(&parent.node, key, max(&leaf.node));
-				value.ptr = sibling.addr;
+				value = sibling.addr;
 				i_leaf--;
 				leaf = parent;
 			} else if (status != SUCCESS) {

@@ -67,14 +67,14 @@ static bool validate_children(bptr_t root, bptr_t node, FILE *stream, Node const
 			if (mem_read(node, memory).keys[i] == INVALID) {
 				fprintf(stream, "out of children\n");
 				break;
-			} else if (mem_read(node, memory).values[i].ptr >= MEM_SIZE) {
+			} else if (mem_read(node, memory).values[i] >= MEM_SIZE) {
 				fprintf(stream,
 					"invalid, address %u >= %u\n",
-					mem_read(node, memory).values[i].ptr, MEM_SIZE
+					mem_read(node, memory).values[i], MEM_SIZE
 				);
 				result = false;
 			} else if (!validate_children(
-					root, mem_read(node, memory).values[i].ptr, stream, memory
+					root, mem_read(node, memory).values[i], stream, memory
 				)) {
 				result = false;
 			}
@@ -102,7 +102,7 @@ static bool subtree_unlocked(bptr_t node, FILE *stream, Node const *memory) {
 	} else {
 		for (li_t i = 0; i < TREE_ORDER; ++i) {
 			if (n.keys[i] == INVALID) return result;
-			result |= subtree_unlocked(n.values->ptr, stream, memory);
+			result |= subtree_unlocked(n.values[i], stream, memory);
 		}
 	}
 

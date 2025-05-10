@@ -14,10 +14,7 @@ typedef uint32_t bptr_t;
 typedef int32_t bdata_t;
 //! @brief Datatype of node values, which can be either data or pointers within
 //!        the tree
-typedef union {
-	bptr_t ptr;   //!< Internal node value which points to another node
-	bdata_t data; //!< Leaf node value which holds data
-} bval_t;
+typedef bdata_t bval_t;
 // Leaf index type
 #if TREE_ORDER < (1 << 8)
 typedef uint_fast8_t li_t;

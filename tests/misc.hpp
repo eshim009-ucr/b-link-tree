@@ -48,11 +48,11 @@ TEST(ValidateTest, RootOneChild) {
 	root.node = mem_read_lock(root.addr, memory);
 	AddrNode lchild = {.node = mem_read_lock(0, memory), .addr = 0};
 
-	root.node.keys[0] = 6; root.node.values[0].ptr = 0;
-	lchild.node.keys[0] = 1; lchild.node.values[0].data = -1;
-	lchild.node.keys[1] = 2; lchild.node.values[1].data = -2;
-	lchild.node.keys[2] = 4; lchild.node.values[2].data = -4;
-	lchild.node.keys[3] = 5; lchild.node.values[3].data = -5;
+	root.node.keys[0] = 6; root.node.values[0] = 0;
+	lchild.node.keys[0] = 1; lchild.node.values[0] = -1;
+	lchild.node.keys[1] = 2; lchild.node.values[1] = -2;
+	lchild.node.keys[2] = 4; lchild.node.values[2] = -4;
+	lchild.node.keys[3] = 5; lchild.node.values[3] = -5;
 	mem_write_unlock(&root, memory);
 	mem_write_unlock(&lchild, memory);
 	dump_node_list(log_stream, memory);

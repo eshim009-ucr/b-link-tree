@@ -31,7 +31,7 @@ bstatusval_t find_next(Node const *n, bkey_t key) {
 		// so the key is greater than any current tree value
 		result.value = n->values[TREE_ORDER-1];
 	} else {
-		result.value.ptr = n->next;
+		result.value = n->next;
 	}
 	return result;
 }
@@ -39,7 +39,7 @@ bstatusval_t find_next(Node const *n, bkey_t key) {
 
 bstatusval_t find_value(Node const *n, bkey_t key) {
 	bstatusval_t result = {SUCCESS, {INVALID}};
-	for (li_t i = 0; i < TREE_ORDER; ++i) {
+	for (unsigned int i = 0; i < TREE_ORDER; ++i) {
 		if (n->keys[i] == key) {
 			result.value = n->values[i];
 			return result;
@@ -61,6 +61,6 @@ bool is_full(Node const *n) {
 void clear(Node *n) {
 	for (li_t i = 0; i < TREE_ORDER; ++i) {
 		n->keys[i] = INVALID;
-		n->values[i].data = INVALID;
+		n->values[i] = INVALID;
 	}
 }

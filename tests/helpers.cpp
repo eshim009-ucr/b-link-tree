@@ -15,7 +15,7 @@ void *stride_insert(void *argv) {
 	bval_t value;
 	if (args.stride > 0 && args.end > args.start) {
 		for (int_fast32_t i = args.start; i <= args.end; i += args.stride) {
-			value.data = -i;
+			value = -i;
 			if (insert(args.root, i, value, memory) != SUCCESS) {
 				args.pass = false;
 				pthread_exit(NULL);
@@ -23,7 +23,7 @@ void *stride_insert(void *argv) {
 		}
 	} else if (args.stride < 0 && args.end < args.start) {
 		for (int_fast32_t i = args.start; i >= args.end; i += args.stride) {
-			value.data = -i;
+			value = -i;
 			if (insert(args.root, i, value, memory) != SUCCESS) {
 				args.pass = false;
 				pthread_exit(NULL);
@@ -51,7 +51,7 @@ bool check_inserted_leaves() {
 			} else {
 				if (
 					node.node.keys[j] != next_val ||
-					node.node.values[j].data != -next_val
+					node.node.values[j] != -next_val
 				) return false;
 				next_val++;
 			}

@@ -22,7 +22,7 @@ ErrorCode trace_lineage(bptr_t root, bkey_t key, bptr_t *lineage, Node const *me
 		node = mem_read(lineage[curr], memory);
 		result = find_next(&node, key);
 		if (result.status != SUCCESS) return result.status;
-		lineage[++curr] = result.value.ptr;
+		lineage[++curr] = result.value;
 	}
 
 	return SUCCESS;
