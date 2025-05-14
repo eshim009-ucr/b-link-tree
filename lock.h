@@ -8,7 +8,8 @@
 #include <string.h>
 
 #if defined(HLS) || defined(FPGA)
-typedef bool lock_t;
+#include <stdint.h>
+typedef uint32_t lock_t;
 #define LOCK_INIT 0
 #else
 typedef pthread_mutex_t lock_t;
