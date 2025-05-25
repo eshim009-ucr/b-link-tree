@@ -2,6 +2,7 @@
 #include "tests/search.hpp"
 #include "tests/insert.hpp"
 #include "tests/parallel.hpp"
+#include "tests/operations.hpp"
 
 
 FILE *log_stream = fopen("log.txt", "w");
