@@ -8,7 +8,7 @@ OBJ_C=$(subst .c,.o,$(SRC_C))
 OBJ_CPP=$(subst .cpp,.o,$(SRC_CPP))
 OBJ=$(OBJ_C) $(OBJ_CPP)
 # Output Files
-EXE=test
+EXE=blink
 LIB=blink.a
 # Compiler Flags
 CFLAGS=-Wall -std=c11 -g
