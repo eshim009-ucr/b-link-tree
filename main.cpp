@@ -28,7 +28,6 @@ static int run_from_file(int argc, char **argv) {
 	Request reqbuf[0x1000];
 	Response respbuf[0x1000];
 	bptr_t root = 0;
-	Node memory[MEM_SIZE];
 	// Iterators
 	char* bufptr = (char*) reqbuf;
 	uint_fast32_t i_req, i_resp = 0;
@@ -69,8 +68,8 @@ static int run_from_file(int argc, char **argv) {
 	if (fname_out != "/dev/null") {
 		bufptr = (char*) respbuf;
 		fout.open(fname_out, std::ofstream::binary);
-		while (fout.good()) {
-			fout.write(bufptr, sizeof(Response));
+		for (i_resp = 0; i_resp < i_req; ++i_resp) {
+			fout.write(bufptr + (i_resp*sizeof(Response)), sizeof(Response));
 		}
 		fout.close();
 	}
