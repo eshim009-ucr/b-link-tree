@@ -25,13 +25,11 @@ static int run_from_file(int argc, char **argv) {
 	std::ifstream fin;
 	std::ofstream fout;
 	// Tree data
-	Request reqbuf[0x1000];
-	Response respbuf[0x1000];
+	std::vector<Request> reqbuf;
+	std::vector<Response> respbuf;
 	bptr_t root = 0;
 	// Iterators
-	char* bufptr = (char*) reqbuf;
-	uint_fast32_t i_req, i_resp = 0;
-
+	Request tmp_req;
 	if (argc < 3) {
 		std::cerr << "Missing request file" << std::endl;
 		return 1;
@@ -50,28 +48,39 @@ static int run_from_file(int argc, char **argv) {
 	}
 
 	// Read request stream
+	std::cout << "Reading request file..." << std::flush;
 	while (fin.good() && !fin.eof()) {
-		fin.read(bufptr + (i_req*sizeof(Request)), sizeof(Request));
-		i_req++;
+		fin.read((char*) &tmp_req, sizeof(Request));
+		reqbuf.push_back(tmp_req);
 	}
+	std::cout << "\nDone!" << std::endl;
 	// "Zero terminate" the request buffer
-	((Request*) bufptr)->opcode = NOP;
+	tmp_req.opcode = NOP;
+	reqbuf.push_back(tmp_req);
 	fin.close();
 
 	// Execute requests
+	std::cout << "Executing " << reqbuf.size() << " requests..." << std::flush;
 	mem_reset_all(memory);
-	for (; i_resp < i_req; ++i_resp) {
-		respbuf[i_resp] = execute_req(reqbuf[i_resp], &root, memory);
+	for (Request req : reqbuf) {
+		respbuf.push_back(execute_req(req, &root, memory));
+		if (respbuf.size() % 10000 == 0) {
+			std::cout << "\n\tExecuted " << respbuf.size()
+				<< '/' << reqbuf.size()
+				<< " (" << 100.0 * respbuf.size() / reqbuf.size() << "%) requests..." << std::flush;
+		}
 	}
+	std::cout << "\nDone!" << std::endl;
 
 	// Write output if requested
 	if (fname_out != "/dev/null") {
-		bufptr = (char*) respbuf;
+		std::cout << "Writing response file..." << std::flush;
 		fout.open(fname_out, std::ofstream::binary);
-		for (i_resp = 0; i_resp < i_req; ++i_resp) {
-			fout.write(bufptr + (i_resp*sizeof(Response)), sizeof(Response));
+		for (Response resp : respbuf) {
+			fout.write((char*) &resp, sizeof(Response));
 		}
 		fout.close();
+		std::cout << "Done!" << std::endl;
 	}
 
 	return 0;
