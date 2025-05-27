@@ -7,12 +7,14 @@
 #define LEAF_LIMIT (MEM_SIZE * TREE_ORDER / (TREE_ORDER+1))
 
 
+static Request reqbuf[LEAF_LIMIT];
+static Response respbuf[LEAF_LIMIT];
+
+
 int main(int argc, int **argv) {
 	FILE *fout;
 	bkey_t tmp_key;
 	uint_fast32_t tmp_idx;
-	Request reqbuf[LEAF_LIMIT];
-	Response respbuf[LEAF_LIMIT];
 
 	srand(0);
 
