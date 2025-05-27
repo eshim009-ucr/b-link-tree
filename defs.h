@@ -1,8 +1,10 @@
 #ifndef DEFS_H
 #define DEFS_H
 
+#ifdef STACK_ALLOC
 // Allegedly the pow calls get optimized out at high enough optimization levels
 #include <math.h>
+#endif
 
 //! Number of children in each node of a tree
 #define TREE_ORDER (4)
