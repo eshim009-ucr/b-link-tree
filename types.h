@@ -34,7 +34,9 @@ typedef uint_fast32_t li_t;
 	X(NOT_FOUND, 3) \
 	X(INVALID_ARGUMENT, 4) \
 	X(OUT_OF_MEMORY, 5) \
-	X(PARENT_FULL, 6)
+	X(PARENT_FULL, 6) \
+	X(RESTART, 7)
+#define MAX_ERR 7
 //! @brief Status codes returned from tree functions
 enum {
 #define X(codename, codeval) codename = codeval,
@@ -57,6 +59,18 @@ typedef struct {
 } bstatusval_t;
 
 #define INVALID ((bkey_t) -1)
+
+
+//! @brief Key/value pair
+typedef struct {
+	bkey_t key;
+	bval_t value;
+} KvPair;
+
+typedef bkey_t search_in_t;
+typedef bstatusval_t search_out_t;
+typedef KvPair insert_in_t;
+typedef ErrorCode insert_out_t;
 
 
 #endif

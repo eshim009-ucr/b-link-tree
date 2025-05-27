@@ -47,9 +47,17 @@ ErrorCode insert_after_split(
 	} else {
 		status = insert_nonfull(&sibling->node, key, value);
 	}
+#ifdef OPTIMISTIC_LOCK
+	if (status != SUCCESS) return status;
+	if (
+		!mem_write_unlock(sibling, memory) || !mem_write_unlock(leaf, memory)
+	) return RESTART;
+	return SUCCESS;
+#else
 	mem_write_unlock(sibling, memory);
 	mem_write_unlock(leaf, memory);
 	return status;
+#endif
 }
 
 

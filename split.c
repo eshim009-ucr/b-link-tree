@@ -194,7 +194,11 @@ ErrorCode split_node(
 		status = split_nonroot(root, leaf, parent, sibling);
 	}
 	if (status == SUCCESS) {
+		#ifdef OPTIMISTIC_LOCK
+		if (!mem_write_unlock(parent, memory)) status = RESTART;
+		#else
 		mem_write_unlock(parent, memory);
+		#endif
 	}
 	return status;
 }

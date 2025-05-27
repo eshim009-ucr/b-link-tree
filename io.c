@@ -4,7 +4,6 @@
 #include "node.h"
 #include <stdio.h>
 
-
 //! @brief Print keys of a node in a human-readable format
 //!
 //! Helper function for @ref dump_node_list
@@ -23,11 +22,15 @@ void dump_keys(FILE *stream, Node const *node) {
 			fprintf(stream, ", ");
 		}
 	}
+	#ifdef OPTIMISTIC_LOCK
+	fprintf(stream, "; %3u] ", node->lock);
+	#else
 	if (lock_test(&node->lock)) {
 		fprintf(stream, "; LCK] ");
 	} else {
 		fprintf(stream, ";    ] ");
 	}
+	#endif
 }
 
 //! @brief Print values of a node in a human-readable format
@@ -80,12 +83,12 @@ void dump_node_list(FILE *stream, Node const *memory) {
 	uint_fast16_t i, r, c;
 	fprintf(stream, "LEAVES\n%2u ", 0);
 	for (i = 0; i < MAX_LEAVES; ++i) {
-		n = mem_read(i, memory);
+		n = memory[i];
 		dump_keys(stream, &n);
 	}
 	fprintf(stream, "\n   ");
 	for (i = 0; i < MAX_LEAVES; ++i) {
-		n = mem_read(i, memory);
+		n = memory[i];
 		dump_values(stream, &n);
 	}
 	fprintf(stream, "\n");
@@ -96,12 +99,12 @@ void dump_node_list(FILE *stream, Node const *memory) {
 		fprintf(stream, "%2u ", r*MAX_NODES_PER_LEVEL);
 		#pragma GCC diagnostic pop
 		for (c = 0; c < MAX_NODES_PER_LEVEL; ++c) {
-			n = mem_read(r*MAX_NODES_PER_LEVEL + c, memory);
+			n = memory[r*MAX_NODES_PER_LEVEL + c];
 			dump_keys(stream, &n);
 		}
 		fprintf(stream, "\n   ");
 		for (c = 0; c < MAX_NODES_PER_LEVEL; ++c) {
-			n = mem_read(r*MAX_NODES_PER_LEVEL + c, memory);
+			n = memory[r*MAX_NODES_PER_LEVEL + c];
 			dump_values(stream, &n);
 		}
 		fprintf(stream, "\n");

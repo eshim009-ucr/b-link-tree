@@ -10,29 +10,47 @@ extern "C" {
 
 
 void *stride_insert(void *argv) {
+	ErrorCode status;
 	si_args args = *(si_args *)argv;
+	args.pass = true;
 	bval_t value;
 	if (args.stride > 0 && args.end > args.start) {
 		for (int_fast32_t i = args.start; i <= args.end; i += args.stride) {
 			value.data = -i;
-			EXPECT_EQ(insert(args.root, i, value, memory), SUCCESS);
+			status = insert(args.root, i, value, memory);
+			if (status != SUCCESS) {
+				EXPECT_EQ(status, SUCCESS)
+					<< "insert(" << i << ", " << -i << ") threw "
+					<< ERROR_CODE_NAMES[status]
+					<< " (" << (int) status << ")";
+				args.pass = false;
+				pthread_exit(NULL);
+			}
 		}
 	} else if (args.stride < 0 && args.end < args.start) {
 		for (int_fast32_t i = args.start; i >= args.end; i += args.stride) {
 			value.data = -i;
-			EXPECT_EQ(insert(args.root, i, value, memory), SUCCESS);
+			status = insert(args.root, i, value, memory);
+			if (status != SUCCESS) {
+				EXPECT_EQ(status, SUCCESS)
+					<< "insert(" << i << ", " << -i << ") threw "
+					<< ERROR_CODE_NAMES[status]
+					<< " (" << (int) status << ")";
+				args.pass = false;
+				pthread_exit(NULL);
+			}
 		}
 	} else {
 		// Invalid arguments supplied
 		// Arguments should be explicit in the test harness,
 		// so this is a programmer error
-		assert(false);
+		args.pass = false;
 	}
 	pthread_exit(NULL);
 }
 
 
-void check_inserted_leaves() {
+bool check_inserted_leaves() {
 	uint_fast8_t next_val = 1;
 	AddrNode node = {.addr = 0};
 
@@ -42,11 +60,18 @@ void check_inserted_leaves() {
 			if (node.node.keys[j] == INVALID) {
 				break;
 			} else {
-				EXPECT_EQ(node.node.keys[j], next_val);
-				EXPECT_EQ(node.node.values[j].data, -next_val);
+				if (
+					node.node.keys[j] != next_val ||
+					node.node.values[j].data != -next_val
+				) {
+					EXPECT_EQ(node.node.keys[j], next_val);
+					EXPECT_EQ(node.node.values[j].data, -next_val);
+					return false;
+				}
 				next_val++;
 			}
 		}
 		node.addr = node.node.next;
 	}
+	return true;
 }

@@ -121,7 +121,7 @@ TEST(InsertTest, SequentialInsert) {
 		dump_node_list(log_stream, memory);
 		ASSERT_TRUE(is_unlocked(root, log_stream, memory));
 	}
-	check_inserted_leaves();
+	EXPECT_TRUE(check_inserted_leaves());
 
 	EXPECT_TRUE(validate(root, log_stream, memory));
 	fprintf(log_stream, "\n\n");

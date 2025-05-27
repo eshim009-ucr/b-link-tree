@@ -92,6 +92,9 @@ bool validate(bptr_t root, FILE *stream, Node const *memory) {
 //! @return `true` if `node` and all of its children are unlocked,
 //!         `false` otherwise
 static bool subtree_unlocked(bptr_t node, FILE *stream, Node const *memory) {
+#ifdef OPTIMISTIC_LOCK
+	return true;
+#else
 	Node n = mem_read(node, memory);
 	bool result = !lock_test(&n.lock);
 
@@ -102,11 +105,12 @@ static bool subtree_unlocked(bptr_t node, FILE *stream, Node const *memory) {
 	} else {
 		for (li_t i = 0; i < TREE_ORDER; ++i) {
 			if (n.keys[i] == INVALID) return result;
-			result |= subtree_unlocked(n.values->ptr, stream, memory);
+			result |= subtree_unlocked(n.values[i].ptr, stream, memory);
 		}
 	}
 
 	return result;
+#endif
 }
 
 //! @return `true` if all nodes in this tree are unlocked, `false` otherwise

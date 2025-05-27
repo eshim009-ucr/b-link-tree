@@ -7,7 +7,11 @@
 #include <string.h>
 
 
+#ifdef OPTIMISTIC_LOCK
+static ErrorCode optimistic_insert(bptr_t *root, bkey_t key, bval_t value, Node *memory) {
+#else
 ErrorCode insert(bptr_t *root, bkey_t key, bval_t value, Node *memory) {
+#endif
 	ErrorCode status;
 	li_t i_leaf;
 	AddrNode leaf, parent, sibling;
@@ -35,7 +39,11 @@ ErrorCode insert(bptr_t *root, bkey_t key, bval_t value, Node *memory) {
 
 		if (!is_full(&leaf.node)) {
 			status = insert_nonfull(&leaf.node, key, value);
+			#ifdef OPTIMISTIC_LOCK
+			if (!mem_write_unlock(&leaf, memory)) return RESTART;
+			#else
 			mem_write_unlock(&leaf, memory);
+			#endif
 			if (parent.addr != INVALID) mem_unlock(parent.addr, memory);
 			if (status != SUCCESS) return status;
 		} else {
@@ -67,3 +75,13 @@ ErrorCode insert(bptr_t *root, bkey_t key, bval_t value, Node *memory) {
 
 	return SUCCESS;
 }
+
+#ifdef OPTIMISTIC_LOCK
+ErrorCode insert(bptr_t *root, bkey_t key, bval_t value, Node *memory) {
+	ErrorCode status;
+	do {
+		status = optimistic_insert(root, key, value, memory);
+	} while (status == RESTART);
+	return status;
+}
+#endif
