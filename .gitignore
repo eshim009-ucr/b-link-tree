@@ -1,5 +1,6 @@
 # Binaries
 *.o
+*.a
 test
 
 # Generated documentation

@@ -61,4 +61,16 @@ typedef struct {
 #define INVALID ((bkey_t) -1)
 
 
+//! @brief Key/value pair
+typedef struct {
+	bkey_t key;
+	bval_t value;
+} KvPair;
+
+typedef bkey_t search_in_t;
+typedef bstatusval_t search_out_t;
+typedef KvPair insert_in_t;
+typedef ErrorCode insert_out_t;
+
+
 #endif
