@@ -29,15 +29,18 @@ static ErrorCode alloc_sibling(
 	Node *memory
 ) {
 	const uint_fast8_t level = get_level(leaf->addr);
+	bool success;
 
 	// Find an empty spot for the new leaf
 	for (sibling->addr = level * MAX_NODES_PER_LEVEL;
 		sibling->addr < (level+1) * MAX_NODES_PER_LEVEL;
 		++sibling->addr) {
 		// Found an empty slot
-		if (leaf->addr != sibling->addr
-			&& mem_read(sibling->addr, memory).keys[0] == INVALID) {
+		sibling->node = mem_read_trylock(sibling->addr, memory, &success);
+		if (success && sibling->node.keys[0] == INVALID) {
 			break;
+		} else {
+			mem_unlock(sibling->addr, memory);
 		}
 	}
 	// If we didn't break, we didn't find an empty slot
@@ -45,7 +48,6 @@ static ErrorCode alloc_sibling(
 		sibling->addr = INVALID;
 		return OUT_OF_MEMORY;
 	}
-	sibling->node = mem_read_lock(sibling->addr, memory);
 	// Adjust next node pointers
 	sibling->node.next = leaf->node.next;
 	leaf->node.next = sibling->addr;

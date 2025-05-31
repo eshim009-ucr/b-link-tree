@@ -4,6 +4,7 @@
 
 #include "types.h"
 #include <stddef.h>
+#include <stdbool.h>
 
 typedef struct Node Node;
 typedef struct AddrNode AddrNode;
@@ -14,6 +15,11 @@ Node mem_read(bptr_t address, Node const *memory);
 
 //! @brief Read a node from memory, locking it in memory
 Node mem_read_lock(bptr_t address, Node *memory);
+
+//! @brief Read a node from memory, locking it in memory if possible,
+//         otherwise setting success to false
+Node mem_read_trylock(bptr_t address, Node *memory, bool *success);
+
 
 #ifdef OPTIMISTIC_LOCK
 #include <stdbool.h>

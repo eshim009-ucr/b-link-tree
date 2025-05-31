@@ -50,6 +50,16 @@ bstatusval_t find_value(Node const *n, bkey_t key) {
 }
 
 
+bool has_value(Node const *n, bval_t value) {
+	for (li_t i = 0; i < TREE_ORDER; ++i) {
+		if (memcmp(&n->values[i], &value, sizeof(bval_t)) == 0) {
+			return true;
+		}
+	}
+	return false;
+}
+
+
 bool is_valid(Node const *n) {
 	return n->keys[0] != INVALID;
 }
