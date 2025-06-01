@@ -19,7 +19,7 @@ inline static void init_node(Node *node) {
 //! @brief Allocate a new sibling node in an empty slot in main mameory
 //!
 //! Acquires a lock on the sibling node
-static ErrorCode alloc_sibling(
+ErrorCode alloc_sibling(
 	//! [in] Root of the tree the nodes reside in
 	bptr_t const *root,
 	//! [in] The node to split

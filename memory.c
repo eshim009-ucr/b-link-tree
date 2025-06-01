@@ -44,6 +44,11 @@ Node mem_read_lock(bptr_t address, Node *memory) {
 #endif
 }
 
+void mem_write(AddrNode const *node, Node *memory) {
+	assert(node->addr < MEM_SIZE);
+	memory[node->addr] = node->node;
+}
+
 #ifdef OPTIMISTIC_LOCK
 bool mem_write_unlock(AddrNode *node, Node *memory) {
 	assert(node->addr < MEM_SIZE);

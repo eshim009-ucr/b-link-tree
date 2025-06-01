@@ -23,5 +23,15 @@ ErrorCode split_node(
 	Node *memory
 );
 
+ErrorCode alloc_sibling(
+	//! [in] Root of the tree the nodes reside in
+	bptr_t const *root,
+	//! [in] The node to split
+	AddrNode *leaf,
+	//! [out] The contents of the split node's new sibling
+	AddrNode *sibling,
+	Node *memory
+);
+
 
 #endif

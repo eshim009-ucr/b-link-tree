@@ -7,70 +7,74 @@
 #include <string.h>
 
 
+static bstatusval_t scan_node(Node const *A, bkey_t v) {
+	return find_next(A, v);
+}
+
+static void move_right(AddrNode *A_current, bkey_t v, bptr_t *t, Node *memory) {
+	bstatusval_t sv = scan_node(&A_current->node, v);
+	if (sv.status != SUCCESS) return;
+	while ((*t = sv.value.ptr) == A_current->node.next) {
+		(void) mem_read_lock(*t, memory);
+		mem_unlock(A_current->addr, memory);
+		A_current->addr = *t;
+		A_current->node = mem_read(A_current->addr, memory);
+	}
+}
+
+
 #ifdef OPTIMISTIC_LOCK
 static ErrorCode optimistic_insert(bptr_t *root, bkey_t key, bval_t value, Node *memory) {
 #else
 ErrorCode insert(bptr_t *root, bkey_t key, bval_t value, Node *memory) {
 #endif
-	ErrorCode status;
-	li_t i_leaf;
-	AddrNode leaf, parent, sibling;
-	bptr_t lineage[MAX_LEVELS];
-	bool keep_splitting = false;
+	uint_fast8_t stack_top = 0;
+	bstatusval_t sv;
+	bptr_t stack[MAX_LEVELS];
+	bkey_t v = key;
+	bptr_t t, y, w, old_node;
+	AddrNode Bu;
+	AddrNode A_current = {.node=mem_read(*root, memory), .addr=*root};
 
-	// Initialize lineage array
-	memset(lineage, INVALID, MAX_LEVELS*sizeof(bptr_t));
-	// Try to trace lineage
-	status = trace_lineage(*root, key, lineage, memory);
-	if (status != SUCCESS) return status;
-	// Load leaf
-	i_leaf = get_leaf_idx(lineage);
-	leaf.addr = lineage[i_leaf];
-	leaf.node = mem_read_lock(leaf.addr, memory);
-	do {
-		// Load this node's parent, if it exists
-		if (i_leaf > 0) {
-			parent.addr = lineage[i_leaf-1];
-			parent.node = mem_read_lock(parent.addr, memory);
+	while (!is_leaf(A_current.addr)) {
+		t = A_current.addr;
+		sv = scan_node(&A_current.node, v);
+		if (sv.status == NOT_FOUND && *root == 0) {
+			break;
 		} else {
-			parent.addr = INVALID;
+			A_current.addr = sv.value.ptr;
 		}
+		if (t != A_current.node.next) {
+			stack[stack_top++] = t;
+		}
+		A_current.node = mem_read(A_current.addr, memory);
+	}
 
-		if (!is_full(&leaf.node)) {
-			status = insert_nonfull(&leaf.node, key, value);
-			#ifdef OPTIMISTIC_LOCK
-			if (!mem_write_unlock(&leaf, memory)) return RESTART;
-			#else
-			mem_write_unlock(&leaf, memory);
-			#endif
-			if (parent.addr != INVALID) mem_unlock(parent.addr, memory);
-			if (status != SUCCESS) return status;
-		} else {
-			// Try to split this node
-			status = split_node(root, &leaf, &parent, &sibling, memory);
-			keep_splitting = (status == PARENT_FULL);
-			// Unrecoverable failure
-			if (status != SUCCESS && status != PARENT_FULL) {
-				mem_unlock(leaf.addr, memory);
-				if (sibling.addr != INVALID) mem_unlock(sibling.addr, memory);
-				mem_unlock(parent.addr, memory);
-				return status;
-			}
-			// Insert the new content and unlock leaf and its sibling
-			status = insert_after_split(key, value, &leaf, &sibling, memory);
-			if (keep_splitting) {
-				// Try this again on the parent
-				key = max(&sibling.node);
-				rekey(&parent.node, key, max(&leaf.node));
-				value.ptr = sibling.addr;
-				i_leaf--;
-				leaf = parent;
-			} else if (status != SUCCESS) {
-				mem_unlock(parent.addr, memory);
-				return status;
-			}
-		}
-	} while (keep_splitting);
+	A_current.node = mem_read_lock(A_current.addr, memory);
+	move_right(&A_current, v, &t, memory);
+	if (find_value(&A_current.node, v).status != NOT_FOUND) {
+		return KEY_EXISTS;
+	}
+
+	w = A_current.addr;
+	do_insertion:
+	if (!is_full(&A_current.node)) {
+		if (insert_nonfull(&A_current.node, v, value) != SUCCESS) assert(0);
+		mem_write_unlock(&A_current, memory);
+	} else {
+		alloc_sibling(root, &A_current, &Bu, memory);
+		y = max(&A_current.node);
+		mem_write(&Bu, memory);
+		mem_write(&A_current, memory);
+		old_node = A_current.addr;
+		v = y;
+		w = Bu.addr;
+		A_current.addr = stack[stack_top--];
+		A_current.node = mem_read_lock(A_current.addr, memory);
+		move_right(&A_current, v, &t, memory);
+		mem_unlock(old_node, memory);
+		goto do_insertion;
+	}
 
 	return SUCCESS;
 }

@@ -15,6 +15,7 @@ Node mem_read(bptr_t address, Node const *memory);
 //! @brief Read a node from memory, locking it in memory
 Node mem_read_lock(bptr_t address, Node *memory);
 
+void mem_write(AddrNode const *node, Node *memory);
 #ifdef OPTIMISTIC_LOCK
 #include <stdbool.h>
 //! @brief Write a node to memory and unlock it
