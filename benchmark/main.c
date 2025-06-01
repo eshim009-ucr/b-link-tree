@@ -15,6 +15,7 @@ int main(int argc, int **argv) {
 	FILE *fout;
 	bkey_t tmp_key;
 	uint_fast32_t tmp_idx;
+	char strbuf[64];
 
 	srand(0);
 
@@ -44,11 +45,18 @@ int main(int argc, int **argv) {
 	fwrite(reqbuf, sizeof(Request), LEAF_LIMIT, fout);
 	fclose(fout);
 	for (uint_fast8_t i = 0; i < 5; ++i) {
-		char fname[] = "insert_random_1-of-5_req.bin";
-		fname[14] = '1'+i;
-		fout = fopen(fname, "wb");
+		sprintf(strbuf, "insert_random_%d-of-5_req.bin", i+1);
+		fout = fopen(strbuf, "wb");
 		fwrite(reqbuf + i*LEAF_LIMIT*sizeof(Request)/5, sizeof(Request), LEAF_LIMIT/5, fout);
 		fclose(fout);
+	}
+	for (uint_fast8_t i = 1; i <= 3; ++i) {
+		for (uint_fast8_t j = 0; j < (1<<i); ++j) {
+			sprintf(strbuf, "insert_random_%d-of-%d_req.bin", j+1, 1<<i);
+			fout = fopen(strbuf, "wb");
+			fwrite(reqbuf + i*LEAF_LIMIT*sizeof(Request)/5, sizeof(Request), LEAF_LIMIT/5, fout);
+			fclose(fout);
+		}
 	}
 
 	// Shuffle the keys from the last insert buffer
@@ -64,11 +72,18 @@ int main(int argc, int **argv) {
 	fwrite(reqbuf, sizeof(Request), LEAF_LIMIT, fout);
 	fclose(fout);
 	for (uint_fast8_t i = 0; i < 5; ++i) {
-		char fname[] = "search_random_1-of-5_req.bin";
-		fname[14] = '1'+i;
-		fout = fopen(fname, "wb");
+		sprintf(strbuf, "search_random_%d-of-5_req.bin", i+1);
+		fout = fopen(strbuf, "wb");
 		fwrite(reqbuf + i*LEAF_LIMIT*sizeof(Request)/5, sizeof(Request), LEAF_LIMIT/5, fout);
 		fclose(fout);
+	}
+	for (uint_fast8_t i = 1; i <= 3; ++i) {
+		for (uint_fast8_t j = 0; j < (1<<i); ++j) {
+			sprintf(strbuf, "search_random_%d-of-%d_req.bin", j+1, 1<<i);
+			fout = fopen(strbuf, "wb");
+			fwrite(reqbuf + i*LEAF_LIMIT*sizeof(Request)/5, sizeof(Request), LEAF_LIMIT/5, fout);
+			fclose(fout);
+		}
 	}
 
 	return 0;

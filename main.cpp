@@ -3,6 +3,7 @@
 #include "tests/insert.hpp"
 #include "tests/parallel.hpp"
 #include "tests/operations.hpp"
+#include "loader.hpp"
 #include <cstring>
 #include <fstream>
 
@@ -33,45 +34,6 @@ static void *tree_thread(void *argv) {
 }
 
 
-static int read_req_file(const char *filename, std::vector<Request>& reqbuf) {
-	std::ifstream fin;
-	Request tmp_req;
-
-	fin.open(filename, std::ifstream::binary);
-	if (!fin.is_open()) {
-		return 1;
-	}
-
-	// Read request stream
-	std::cout << "Reading request file..." << std::flush;
-	while (fin.good() && !fin.eof()) {
-		fin.read((char*) &tmp_req, sizeof(Request));
-		reqbuf.push_back(tmp_req);
-		if (reqbuf.size() % 1000000 == 0) {
-			std::cout << "\n\tLoaded " << reqbuf.size()
-				<< " requests..." << std::flush;
-		}
-	}
-	std::cout << "\nDone!" << std::endl;
-	fin.close();
-
-	return 0;
-}
-
-static int write_resp_file(const char *filename, std::vector<Response> const& respbuf) {
-	std::ofstream fout;
-	std::cout << "Writing response file..." << std::flush;
-	fout.open(filename, std::ofstream::binary);
-	for (Response resp : respbuf) {
-		fout.write((char*) &resp, sizeof(Response));
-	}
-	fout.close();
-	std::cout << "Done!" << std::endl;
-
-	return 0;
-}
-
-
 static int run_gtests(int argc, char **argv) {
 	testing::InitGoogleTest(&argc, argv);
 	int status = RUN_ALL_TESTS();
@@ -81,71 +43,48 @@ static int run_gtests(int argc, char **argv) {
 
 
 static int run_from_file(int argc, char **argv) {
-	// File I/O
-	std::string fname_in, fname_out;
+	// Thread stuff
+	uint_fast8_t thread_count = argc-2;
+	std::vector<pthread_t> threads(thread_count);
+	std::vector<ThreadArgs> threads_args(thread_count);
 	// Tree data
-	std::vector<Request> reqbuf;
-	std::vector<Response> respbuf;
+	std::vector<std::vector<Request>> reqbufs(thread_count);
+	std::vector<std::vector<Response>> respbufs(thread_count);
 	bptr_t root = 0;
-	// Iterators
-	uint_fast8_t thread_count;
-	Request tmp_req;
-	std::vector<pthread_t> threads;
-	std::vector<ThreadArgs> threads_args;
+	// Timing
+	clock_t timer;
 
 	if (argc < 3) {
-		std::cerr << "Missing thread count" << std::endl;
-		return 1;
-	}
-	thread_count = atoi(argv[2]);
-	if (thread_count == 0) {
-		std::cerr << "Invalid thread count \"" << argv[2]
-			<< "\", running with only one 1 thread" << std::endl;
-		thread_count = 1;
-	}
-
-	if (argc < 4) {
 		std::cerr << "Missing request file" << std::endl;
 		return 1;
 	}
 
-	if (argc < 5) {
-		fname_out = "/dev/null";
-	} else {
-		fname_out = argv[4];
-	}
-	if (read_req_file(argv[3], reqbuf)) return 1;
-	// "Zero terminate" the request buffer
-	tmp_req.opcode = NOP;
-	for (uint_fast8_t i = 0; i < thread_count; ++i) {
-		reqbuf.push_back(tmp_req);
+	for (uint_fast8_t i = 0; i < argc-2; ++i) {
+		if (read_req_file(argv[i+2], reqbufs.at(i))) {
+			std::cerr << "Failed to read file " << argv[i+2] << std::endl;
+			return 1;
+		}
+		respbufs.at(i).resize(reqbufs.at(i).size());
+		threads_args.at(i).thread_id = i;
+		threads_args.at(i).thread_count = thread_count;
+		threads_args.at(i).op_count = reqbufs.at(i).size();
+		threads_args.at(i).requests = reqbufs.at(i).data();
+		threads_args.at(i).responses = respbufs.at(i).data();
+		threads_args.at(i).root = &root;
 	}
 
 	// Execute requests
-	std::cout << "Executing " << reqbuf.size() << " requests on "
-		<< (int) thread_count << " threads..." << std::flush;
+	std::cout << "Executing on " << thread_count << " threads..." << std::flush;
 	mem_reset_all(memory);
-	respbuf.resize(reqbuf.size());
-	threads.resize(thread_count);
-	threads_args.resize(thread_count);
+	timer = clock();
 	for (uint_fast8_t i = 0; i < thread_count; ++i) {
-		threads_args[i].thread_id = i;
-		threads_args[i].thread_count = thread_count;
-		threads_args[i].op_count = reqbuf.size();
-		threads_args[i].requests = reqbuf.data();
-		threads_args[i].responses = respbuf.data();
-		threads_args[i].root = &root;
-		pthread_create(&threads[i], NULL, tree_thread, (void*) &threads_args[i]);
+		pthread_create(&threads.at(i), NULL, tree_thread, (void*) &threads_args.at(i));
 	}
 	for (uint_fast8_t i = 0; i < thread_count; ++i) {
-		pthread_join(threads[i], NULL);
+		pthread_join(threads.at(i), NULL);
 	}
-	std::cout << "\nDone!" << std::endl;
-
-	// Write output if requested
-	if (fname_out != "/dev/null") {
-		write_resp_file(fname_out.c_str(), respbuf);
-	}
+	timer = clock() - timer;
+	std::cout << "\ncompleted in " << (1000.0d * timer/CLOCKS_PER_SEC) << "ms" << std::endl;
 
 	return 0;
 }
