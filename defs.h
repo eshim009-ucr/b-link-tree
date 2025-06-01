@@ -23,4 +23,8 @@
 #define MEM_SIZE (1UL<<24)
 #endif
 
+#if !defined NO_GTEST && !__has_include("gtest/gtest.h")
+#define NO_GTEST
+#endif
+
 #endif

@@ -1,7 +1,3 @@
-#if !defined NO_GTEST && !__has_include("CL/opencl.hpp")
-#define NO_GTEST
-#endif
-
 #ifndef NO_GTEST
 extern "C" {
 #include "../insert.h"
