@@ -15,7 +15,7 @@ DEFS=
 CFLAGS=-Wall -std=c11 -g $(addprefix -D,$(DEFS))
 CXXFLAGS=-Wall -std=c++14 -g $(addprefix -D,$(DEFS))
 # Linker Flags
-LDLIBS=-lgtest -lpthread -l:$(LIB)
+LDLIBS=-lpthread -l:$(LIB)
 LDFLAGS=-L.
 
 

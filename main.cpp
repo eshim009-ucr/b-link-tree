@@ -1,9 +1,21 @@
+#if !defined NO_GTEST && !__has_include("CL/opencl.hpp")
+#define NO_GTEST
+#endif
+
+#ifndef NO_GTEST
 #include "tests/misc.hpp"
 #include "tests/search.hpp"
 #include "tests/insert.hpp"
 #include "tests/parallel.hpp"
 #include "tests/operations.hpp"
+#endif
 #include "loader.hpp"
+extern "C" {
+#include "memory.h"
+#include "node.h"
+#include "operations.h"
+};
+#include <iostream>
 #include <cstring>
 #include <fstream>
 
@@ -34,12 +46,14 @@ static void *tree_thread(void *argv) {
 }
 
 
+#ifndef NO_GTEST
 static int run_gtests(int argc, char **argv) {
 	testing::InitGoogleTest(&argc, argv);
 	int status = RUN_ALL_TESTS();
 	fclose(log_stream);
 	return status;
 }
+#endif
 
 
 static int run_from_file(int argc, char **argv) {
@@ -108,9 +122,12 @@ static int run_from_file(int argc, char **argv) {
 
 
 int main(int argc, char **argv) {
+#ifndef NO_GTEST
 	if (argc < 2 || strcmp(argv[1], "gtest") == 0) {
 		return run_gtests(argc, argv);
-	} else if (strcmp(argv[1], "exe") == 0) {
+	} else
+#endif
+	if (strcmp(argv[1], "exe") == 0) {
 		return run_from_file(argc, argv);
 	} else {
 		std::cerr << "Unrecognized option, \""

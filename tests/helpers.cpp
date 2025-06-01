@@ -1,3 +1,8 @@
+#if !defined NO_GTEST && !__has_include("CL/opencl.hpp")
+#define NO_GTEST
+#endif
+
+#ifndef NO_GTEST
 extern "C" {
 #include "../insert.h"
 #include "../memory.h"
@@ -76,3 +81,4 @@ bool check_inserted_leaves() {
 	}
 	return true;
 }
+#endif
