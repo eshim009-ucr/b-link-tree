@@ -20,6 +20,7 @@ extern "C" {
 
 extern FILE *log_stream;
 extern Node memory[MEM_SIZE];
+constexpr uint_fast32_t KEY_MAX = (TREE_ORDER/2)*(MAX_LEAVES+1);
 
 
 TEST(ParallelTest, InterleavedAscending) {
@@ -34,7 +35,7 @@ TEST(ParallelTest, InterleavedAscending) {
 	bptr_t root = 0;
 	si_args odd_args = {
 		.start = 1,
-		.end = (TREE_ORDER/2)*(MAX_LEAVES+1),
+		.end = KEY_MAX,
 		.stride = 2,
 		.root = &root
 	};
@@ -85,12 +86,12 @@ TEST(ParallelTest, InterleavedDescending) {
 		.root = &root
 	};
 	si_args even_args = odd_args;
-	if ((TREE_ORDER/2)*(MAX_LEAVES+1) % 2 == 0) {
-		even_args.start = (TREE_ORDER/2)*(MAX_LEAVES+1);
-		odd_args.start = even_args.start - 1;
+	if (KEY_MAX % 2 == 0) {
+		even_args.start = KEY_MAX;
+		odd_args.start = KEY_MAX-1;
 	} else {
-		odd_args.start = (TREE_ORDER/2)*(MAX_LEAVES+1);
-		even_args.start = even_args.start - 1;
+		odd_args.start = KEY_MAX;
+		even_args.start = KEY_MAX-1;
 	}
 	system("mkdir -p thread-logs");
 
@@ -133,7 +134,7 @@ TEST(ParallelTest, CrossfadeInsert) {
 	bptr_t root = 0;
 	si_args odd_args = {
 		.start = 1,
-		.end = (TREE_ORDER/2)*(MAX_LEAVES+1),
+		.end = KEY_MAX,
 		.stride = 2,
 		.root = &root,
 		.pass = true
