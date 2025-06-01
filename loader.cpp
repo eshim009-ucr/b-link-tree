@@ -13,7 +13,7 @@ int read_req_file(const char *filename, std::vector<Request>& reqbuf) {
 	}
 
 	// Read request stream
-	std::cout << "Reading request file..." << std::flush;
+	std::cout << "Reading request file \"" << filename << "\"..." << std::flush;
 	while (fin.good() && !fin.eof()) {
 		fin.read((char*) &tmp_req, sizeof(Request));
 		reqbuf.push_back(tmp_req);

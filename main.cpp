@@ -44,12 +44,13 @@ static int run_gtests(int argc, char **argv) {
 
 static int run_from_file(int argc, char **argv) {
 	// Thread stuff
-	uint_fast8_t thread_count = argc-2;
-	std::vector<pthread_t> threads(thread_count);
-	std::vector<ThreadArgs> threads_args(thread_count);
+	uint_fast8_t offset = 0;
+	std::vector<uint_fast8_t> then_splits;
+	std::vector<pthread_t> threads(argc-2);
+	std::vector<ThreadArgs> threads_args(argc-2);
 	// Tree data
-	std::vector<std::vector<Request>> reqbufs(thread_count);
-	std::vector<std::vector<Response>> respbufs(thread_count);
+	std::vector<std::vector<Request>> reqbufs(argc-2);
+	std::vector<std::vector<Response>> respbufs(argc-2);
 	bptr_t root = 0;
 	// Timing
 	clock_t timer;
@@ -60,31 +61,47 @@ static int run_from_file(int argc, char **argv) {
 	}
 
 	for (uint_fast8_t i = 0; i < argc-2; ++i) {
-		if (read_req_file(argv[i+2], reqbufs.at(i))) {
-			std::cerr << "Failed to read file " << argv[i+2] << std::endl;
-			return 1;
+		if (std::string(argv[i+2]) == "then") {
+			then_splits.push_back(i);
+			offset++;
+		} else {
+			if (read_req_file(argv[i+2], reqbufs.at(i-offset))) {
+				std::cerr << "Failed to read file " << argv[i+2] << std::endl;
+				return 1;
+			}
+			respbufs.at(i-offset).resize(reqbufs.at(i-offset).size());
+			threads_args.at(i-offset).thread_id = i-offset;
+			threads_args.at(i-offset).op_count = reqbufs.at(i-offset).size();
+			threads_args.at(i-offset).requests = reqbufs.at(i-offset).data();
+			threads_args.at(i-offset).responses = respbufs.at(i-offset).data();
+			threads_args.at(i-offset).root = &root;
 		}
-		respbufs.at(i).resize(reqbufs.at(i).size());
-		threads_args.at(i).thread_id = i;
-		threads_args.at(i).thread_count = thread_count;
-		threads_args.at(i).op_count = reqbufs.at(i).size();
-		threads_args.at(i).requests = reqbufs.at(i).data();
-		threads_args.at(i).responses = respbufs.at(i).data();
-		threads_args.at(i).root = &root;
+	}
+	then_splits.push_back(argc-2-offset);
+	uint_fast8_t last = 0;
+	for (uint_fast8_t i = 0; i < then_splits.size(); ++i) {
+		const uint_fast8_t sub_count = then_splits.at(i) - last;
+		for (uint_fast8_t j = last; j < then_splits.at(i); ++j) {
+			threads_args.at(j).thread_count = sub_count;
+		}
+		last += sub_count;
 	}
 
 	// Execute requests
-	std::cout << "Executing on " << thread_count << " threads..." << std::flush;
 	mem_reset_all(memory);
-	timer = clock();
-	for (uint_fast8_t i = 0; i < thread_count; ++i) {
-		pthread_create(&threads.at(i), NULL, tree_thread, (void*) &threads_args.at(i));
+	uint_fast8_t i = 0;
+	for (uint_fast8_t split : then_splits) {
+		std::cout << "Executing on " << (int) threads_args.at(i).thread_count << " threads..." << std::flush;
+		timer = clock();
+		for (; i < split; ++i) {
+			pthread_create(&threads.at(i), NULL, tree_thread, (void*) &threads_args.at(i));
+		}
+		for (; i < split; ++i) {
+			pthread_join(threads.at(i), NULL);
+		}
+		timer = clock() - timer;
+		std::cout << "\ncompleted in " << (1000.0d * timer/CLOCKS_PER_SEC) << "ms" << std::endl;
 	}
-	for (uint_fast8_t i = 0; i < thread_count; ++i) {
-		pthread_join(threads.at(i), NULL);
-	}
-	timer = clock() - timer;
-	std::cout << "\ncompleted in " << (1000.0d * timer/CLOCKS_PER_SEC) << "ms" << std::endl;
 
 	return 0;
 }
