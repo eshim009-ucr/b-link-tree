@@ -1,3 +1,5 @@
+#include "../defs.h"
+#ifndef NO_GTEST
 extern "C" {
 #include "../insert.h"
 #include "../io.h"
@@ -79,3 +81,4 @@ bool check_inserted_leaves() {
 	}
 	return true;
 }
+#endif

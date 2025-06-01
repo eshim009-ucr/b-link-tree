@@ -31,6 +31,14 @@ ErrorCode insert(bptr_t *root, bkey_t key, bval_t value, Node *memory) {
 		// Load this node's parent, if it exists
 		if (i_leaf > 0) {
 			parent.addr = lineage[i_leaf-1];
+			parent.node = mem_read(parent.addr, memory);
+			// If parent has shifted since our initial traversal
+			while (!has_value(&parent.node, (bval_t) leaf.addr)) {
+				mem_unlock(parent.addr, memory);
+				parent.addr = parent.node.next;
+				parent.node = mem_read(parent.addr, memory);
+				if (parent.node.next == INVALID) return NOT_FOUND;
+			}
 			parent.node = mem_read_lock(parent.addr, memory);
 		} else {
 			parent.addr = INVALID;

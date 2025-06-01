@@ -5,6 +5,9 @@
 #include <string.h>
 
 
+static lock_t local_readlock = LOCK_INIT;
+
+
 Node mem_read(bptr_t address, Node const *memory) {
 	assert(address < MEM_SIZE);
 	return memory[address];
@@ -21,7 +24,6 @@ Node mem_read_lock(bptr_t address, Node *memory) {
 #ifdef OPTIMISTIC_LOCK
 	return memory[address];
 #else
-	static lock_t local_readlock = LOCK_INIT;
 	Node tmp;
 
 	assert(address < MEM_SIZE);
@@ -38,6 +40,29 @@ Node mem_read_lock(bptr_t address, Node *memory) {
 	} while(true);
 	// Write back the locked value to main memory
 	memory[address] = tmp;
+	// Release the local lock for future writers
+	lock_v(&local_readlock);
+	return tmp;
+#endif
+}
+
+Node mem_read_trylock(bptr_t address, Node *memory, bool *success) {
+#ifdef OPTIMISTIC_LOCK
+	return memory[address];
+#else
+	Node tmp;
+
+	assert(address < MEM_SIZE);
+	assert(success != NULL);
+	// Read the given address from main memory until its lock is released
+	// Then grab the lock
+	lock_p(&local_readlock);
+	tmp = memory[address];
+	*success = (test_and_set(&tmp.lock) == 0);
+	if (*success) {
+		// Write back the locked value to main memory
+		memory[address] = tmp;
+	}
 	// Release the local lock for future writers
 	lock_v(&local_readlock);
 	return tmp;

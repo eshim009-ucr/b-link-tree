@@ -23,4 +23,8 @@
 #define MEM_SIZE (MAX_NODES_PER_LEVEL * MAX_LEVELS)
 #endif
 
+#if !defined NO_GTEST && !__has_include("gtest/gtest.h")
+#define NO_GTEST
+#endif
+
 #endif

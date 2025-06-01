@@ -42,6 +42,7 @@ typedef struct Node Node;
 bstatusval_t find_next(Node const *n, bkey_t key);
 //! @brief Find the value corresponding to a given key
 bstatusval_t find_value(Node const *n, bkey_t key);
+bool has_value(Node const *n, bval_t value);
 //! @brief "Is empty", returns true for unallocated memory
 bool is_valid(Node const *n);
 //! @brief Check if all keys in a node are in use
