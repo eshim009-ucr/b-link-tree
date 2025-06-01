@@ -1,3 +1,4 @@
+#include "defs.h"
 #ifndef NO_GTEST
 #include "tests/misc.hpp"
 #include "tests/search.hpp"

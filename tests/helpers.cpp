@@ -1,3 +1,4 @@
+#include "../defs.h"
 #ifndef NO_GTEST
 extern "C" {
 #include "../insert.h"
