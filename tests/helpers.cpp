@@ -11,32 +11,32 @@ extern "C" {
 
 void *stride_insert(void *argv) {
 	ErrorCode status;
-	si_args args = *(si_args *)argv;
-	args.pass = true;
+	si_args *args = (si_args *)argv;
+	args->pass = true;
 	bval_t value;
-	if (args.stride > 0 && args.end > args.start) {
-		for (int_fast32_t i = args.start; i <= args.end; i += args.stride) {
+	if (args->stride > 0 && args->end > args->start) {
+		for (int_fast32_t i = args->start; i <= args->end; i += args->stride) {
 			value.data = -i;
-			status = insert(args.root, i, value, memory);
+			status = insert(args->root, i, value, memory);
 			if (status != SUCCESS) {
 				EXPECT_EQ(status, SUCCESS)
 					<< "insert(" << i << ", " << -i << ") threw "
 					<< ERROR_CODE_NAMES[status]
 					<< " (" << (int) status << ")";
-				args.pass = false;
+				args->pass = false;
 				pthread_exit(NULL);
 			}
 		}
-	} else if (args.stride < 0 && args.end < args.start) {
-		for (int_fast32_t i = args.start; i >= args.end; i += args.stride) {
+	} else if (args->stride < 0 && args->end < args->start) {
+		for (int_fast32_t i = args->start; i >= args->end; i += args->stride) {
 			value.data = -i;
-			status = insert(args.root, i, value, memory);
+			status = insert(args->root, i, value, memory);
 			if (status != SUCCESS) {
 				EXPECT_EQ(status, SUCCESS)
 					<< "insert(" << i << ", " << -i << ") threw "
 					<< ERROR_CODE_NAMES[status]
 					<< " (" << (int) status << ")";
-				args.pass = false;
+				args->pass = false;
 				pthread_exit(NULL);
 			}
 		}
@@ -44,7 +44,8 @@ void *stride_insert(void *argv) {
 		// Invalid arguments supplied
 		// Arguments should be explicit in the test harness,
 		// so this is a programmer error
-		args.pass = false;
+		args->pass = false;
+		assert(false);
 	}
 	pthread_exit(NULL);
 }
