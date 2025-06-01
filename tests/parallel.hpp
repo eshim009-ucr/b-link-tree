@@ -118,7 +118,8 @@ TEST(ParallelTest, CrossfadeInsert) {
 		.start = 1,
 		.end = (TREE_ORDER/2)*(MAX_LEAVES+1),
 		.stride = 2,
-		.root = &root
+		.root = &root,
+		.pass = true
 	};
 	si_args even_args = odd_args;
 	even_args.start = odd_args.end;
