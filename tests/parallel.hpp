@@ -43,13 +43,13 @@ TEST(ParallelTest, InterleavedAscending) {
 	even_args.start = 2;
 	system("mkdir -p thread-logs");
 
-	for (uint_fast8_t i = 0; i < PARALLEL_RERUNS; ++i) {
-		fprintf(log_stream, "Run %d\n", i+1);
+	for (uint_fast16_t i = 0; i < PARALLEL_RERUNS; ++i) {
+		fprintf(log_stream, "Run %d\n", (unsigned)i+1);
 		root = 0;
 		mem_reset_all(memory);
-		sprintf(strbuf, "thread-logs/int-asc_run_%04d_%s.log", i, "odd");
+		sprintf(strbuf, "thread-logs/int-asc_run_%04d_%s.log", (unsigned)i, "odd");
 		odd_args.log_stream = fopen(strbuf, "w");
-		sprintf(strbuf, "thread-logs/int-asc_run_%04d_%s.log", i, "even");
+		sprintf(strbuf, "thread-logs/int-asc_run_%04d_%s.log", (unsigned)i, "even");
 		even_args.log_stream = fopen(strbuf, "w");
 
 		pthread_create(&thread_even, NULL, stride_insert, (void*) &even_args);
@@ -95,13 +95,13 @@ TEST(ParallelTest, InterleavedDescending) {
 	}
 	system("mkdir -p thread-logs");
 
-	for (uint_fast8_t i = 0; i < PARALLEL_RERUNS; ++i) {
-		fprintf(log_stream, "Run %d\n", i+1);
+	for (uint_fast16_t i = 0; i < PARALLEL_RERUNS; ++i) {
+		fprintf(log_stream, "Run %d\n", (unsigned)i+1);
 		root = 0;
 		mem_reset_all(memory);
-		sprintf(strbuf, "thread-logs/int-des_run_%04d_%s.log", i, "odd");
+		sprintf(strbuf, "thread-logs/int-des_run_%04d_%s.log", (unsigned)i, "odd");
 		odd_args.log_stream = fopen(strbuf, "w");
-		sprintf(strbuf, "thread-logs/int-des_run_%04d_%s.log", i, "even");
+		sprintf(strbuf, "thread-logs/int-des_run_%04d_%s.log", (unsigned)i, "even");
 		even_args.log_stream = fopen(strbuf, "w");
 
 		pthread_create(&thread_even, NULL, stride_insert, (void*) &even_args);
@@ -145,13 +145,13 @@ TEST(ParallelTest, CrossfadeInsert) {
 	even_args.stride = -odd_args.stride;
 	system("mkdir -p thread-logs");
 
-	for (uint_fast8_t i = 0; i < PARALLEL_RERUNS; ++i) {
-		fprintf(log_stream, "Run %d\n", i+1);
+	for (uint_fast16_t i = 0; i < PARALLEL_RERUNS; ++i) {
+		fprintf(log_stream, "Run %d\n", (unsigned)i+1);
 		root = 0;
 		mem_reset_all(memory);
-		sprintf(strbuf, "thread-logs/x-fade_run_%04d_%s.log", i, "odd");
+		sprintf(strbuf, "thread-logs/x-fade_run_%04d_%s.log", (unsigned)i, "odd");
 		odd_args.log_stream = fopen(strbuf, "w");
-		sprintf(strbuf, "thread-logs/x-fade_run_%04d_%s.log", i, "even");
+		sprintf(strbuf, "thread-logs/x-fade_run_%04d_%s.log", (unsigned)i, "even");
 		even_args.log_stream = fopen(strbuf, "w");
 
 		pthread_create(&thread_even, NULL, stride_insert, (void*) &even_args);
