@@ -7,7 +7,7 @@
 #include <fstream>
 
 
-FILE *log_stream = fopen("log.txt", "w");
+FILE *log_stream = fopen("main.log", "w");
 Node memory[MEM_SIZE];
 
 

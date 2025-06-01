@@ -6,3 +6,6 @@ test
 # Generated documentation
 docs/*
 !docs/doxyfile
+
+# Runtime logs
+*.log

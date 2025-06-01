@@ -3,6 +3,7 @@
 
 
 #include "../types.h"
+#include <cstdio>
 
 
 typedef struct Node Node;
@@ -22,6 +23,7 @@ struct si_args {
 	//! Set by the thread, read up on return.
 	//! False if an insertion error has occurred, true otherwise.
 	bool pass;
+	FILE *log_stream;
 };
 
 
