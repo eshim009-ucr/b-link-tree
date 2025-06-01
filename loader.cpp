@@ -22,6 +22,7 @@ int read_req_file(const char *filename, std::vector<Request>& reqbuf) {
 				<< " requests..." << std::flush;
 		}
 	}
+	std::cout << "\n\tLoaded " << reqbuf.size() << " requests..." << std::flush;
 	std::cout << "\nDone!" << std::endl;
 	fin.close();
 

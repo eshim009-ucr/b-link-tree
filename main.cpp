@@ -37,8 +37,9 @@ static void *tree_thread(void *argv) {
 	ThreadArgs* args = (ThreadArgs *)argv;
 #ifdef STRIDED
 	for (uint_fast64_t i = args->thread_id; i < args->op_count; i += args->thread_count) {
-#else
-	for (uint_fast64_t i = 0; i < args->op_count/args->thread_count; ++i) {
+#else // BLOCKED
+	const uint_fast64_t BLOCK_SIZE = args->op_count/args->thread_count;
+	for (uint_fast64_t i = args->thread_id * BLOCK_SIZE; i < (args->thread_id+1)*BLOCK_SIZE; ++i) {
 #endif
 		args->responses[i] = execute_req(args->requests[i], args->root, memory);
 	}
@@ -59,6 +60,7 @@ static int run_gtests(int argc, char **argv) {
 static int run_from_file(int argc, char **argv) {
 	// Thread stuff
 	uint_fast8_t offset = 0;
+	uint_fast8_t last = 0;
 	std::vector<uint_fast8_t> then_splits;
 	std::vector<pthread_t> threads(argc-2);
 	std::vector<ThreadArgs> threads_args(argc-2);
@@ -92,10 +94,11 @@ static int run_from_file(int argc, char **argv) {
 		}
 	}
 	then_splits.push_back(argc-2-offset);
-	uint_fast8_t last = 0;
+	last = 0;
 	for (uint_fast8_t i = 0; i < then_splits.size(); ++i) {
 		const uint_fast8_t sub_count = then_splits.at(i) - last;
 		for (uint_fast8_t j = last; j < then_splits.at(i); ++j) {
+			threads_args.at(j).thread_id -= last;
 			threads_args.at(j).thread_count = sub_count;
 		}
 		last += sub_count;
@@ -103,17 +106,18 @@ static int run_from_file(int argc, char **argv) {
 
 	// Execute requests
 	mem_reset_all(memory);
-	uint_fast8_t i = 0;
+	last = 0;
 	for (uint_fast8_t split : then_splits) {
-		std::cout << "Executing on " << (int) threads_args.at(i).thread_count << " threads..." << std::flush;
+		std::cout << "Executing on " << (int) threads_args.at(last).thread_count << " threads..." << std::flush;
 		timer = clock();
-		for (; i < split; ++i) {
+		for (uint_fast8_t i = last; i < split; ++i) {
 			pthread_create(&threads.at(i), NULL, tree_thread, (void*) &threads_args.at(i));
 		}
-		for (; i < split; ++i) {
+		for (uint_fast8_t i = last; i < split; ++i) {
 			pthread_join(threads.at(i), NULL);
 		}
 		timer = clock() - timer;
+		last = split;
 		std::cout << "\ncompleted in " << (1000.0d * timer/CLOCKS_PER_SEC) << "ms" << std::endl;
 	}
 
