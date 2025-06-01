@@ -47,14 +47,15 @@ int main(int argc, int **argv) {
 	for (uint_fast8_t i = 0; i < 5; ++i) {
 		sprintf(strbuf, "insert_random_%d-of-5_req.bin", i+1);
 		fout = fopen(strbuf, "wb");
-		fwrite(reqbuf + i*LEAF_LIMIT*sizeof(Request)/5, sizeof(Request), LEAF_LIMIT/5, fout);
+		fwrite(reqbuf + i*LEAF_LIMIT/5, sizeof(Request), LEAF_LIMIT/5, fout);
 		fclose(fout);
 	}
 	for (uint_fast8_t i = 1; i <= 3; ++i) {
-		for (uint_fast8_t j = 0; j < (1<<i); ++j) {
-			sprintf(strbuf, "insert_random_%d-of-%d_req.bin", j+1, 1<<i);
+		const uint_fast8_t total = (1<<i);
+		for (uint_fast8_t j = 0; j < total; ++j) {
+			sprintf(strbuf, "insert_random_%d-of-%d_req.bin", j+1, total);
 			fout = fopen(strbuf, "wb");
-			fwrite(reqbuf + i*LEAF_LIMIT*sizeof(Request)/5, sizeof(Request), LEAF_LIMIT/5, fout);
+			fwrite(reqbuf + i*LEAF_LIMIT/total, sizeof(Request), LEAF_LIMIT/total, fout);
 			fclose(fout);
 		}
 	}
@@ -74,14 +75,15 @@ int main(int argc, int **argv) {
 	for (uint_fast8_t i = 0; i < 5; ++i) {
 		sprintf(strbuf, "search_random_%d-of-5_req.bin", i+1);
 		fout = fopen(strbuf, "wb");
-		fwrite(reqbuf + i*LEAF_LIMIT*sizeof(Request)/5, sizeof(Request), LEAF_LIMIT/5, fout);
+		fwrite(reqbuf + i*LEAF_LIMIT/5, sizeof(Request), LEAF_LIMIT/5, fout);
 		fclose(fout);
 	}
 	for (uint_fast8_t i = 1; i <= 3; ++i) {
-		for (uint_fast8_t j = 0; j < (1<<i); ++j) {
+		const uint_fast8_t total = (1<<i);
+		for (uint_fast8_t j = 0; j < total; ++j) {
 			sprintf(strbuf, "search_random_%d-of-%d_req.bin", j+1, 1<<i);
 			fout = fopen(strbuf, "wb");
-			fwrite(reqbuf + i*LEAF_LIMIT*sizeof(Request)/5, sizeof(Request), LEAF_LIMIT/5, fout);
+			fwrite(reqbuf + i*LEAF_LIMIT/total, sizeof(Request), LEAF_LIMIT/total, fout);
 			fclose(fout);
 		}
 	}
