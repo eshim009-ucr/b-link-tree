@@ -43,6 +43,13 @@ int main(int argc, int **argv) {
 	}
 	fwrite(reqbuf, sizeof(Request), LEAF_LIMIT, fout);
 	fclose(fout);
+	for (uint_fast8_t i = 0; i < 5; ++i) {
+		char fname[] = "insert_random_1-of-5_req.bin";
+		fname[14] = '1'+i;
+		fout = fopen(fname, "wb");
+		fwrite(reqbuf + i*LEAF_LIMIT*sizeof(Request)/5, sizeof(Request), LEAF_LIMIT/5, fout);
+		fclose(fout);
+	}
 
 	// Shuffle the keys from the last insert buffer
 	// Insert and search place keys at the same offset
@@ -56,6 +63,13 @@ int main(int argc, int **argv) {
 	}
 	fwrite(reqbuf, sizeof(Request), LEAF_LIMIT, fout);
 	fclose(fout);
+	for (uint_fast8_t i = 0; i < 5; ++i) {
+		char fname[] = "search_random_1-of-5_req.bin";
+		fname[14] = '1'+i;
+		fout = fopen(fname, "wb");
+		fwrite(reqbuf + i*LEAF_LIMIT*sizeof(Request)/5, sizeof(Request), LEAF_LIMIT/5, fout);
+		fclose(fout);
+	}
 
 	return 0;
 }
