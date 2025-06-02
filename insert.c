@@ -61,7 +61,7 @@ ErrorCode insert(bptr_t *root, bkey_t key, bval_t value, Node *memory) {
 			if (status != SUCCESS && status != PARENT_FULL) {
 				mem_unlock(leaf.addr, memory);
 				if (sibling.addr != INVALID) mem_unlock(sibling.addr, memory);
-				mem_unlock(parent.addr, memory);
+				if (parent.addr != INVALID) mem_unlock(parent.addr, memory);
 				return status;
 			}
 			// Insert the new content and unlock leaf and its sibling

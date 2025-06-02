@@ -1,4 +1,5 @@
 #!/bin/sh
+set -e
 
 
 echo 'Generating Testing Binary...'

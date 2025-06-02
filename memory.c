@@ -81,8 +81,8 @@ bool mem_write_unlock(AddrNode *node, Node *memory) {
 #else
 void mem_write_unlock(AddrNode *node, Node *memory) {
 	assert(node->addr < MEM_SIZE);
-	lock_v(&node->node.lock);
 	memory[node->addr] = node->node;
+	mem_unlock(node->addr, memory);
 }
 #endif
 
