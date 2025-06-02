@@ -7,6 +7,9 @@
 #include "tests/operations.hpp"
 #endif
 #include "thread-runner.hpp"
+extern "C" {
+#include "node.h"
+};
 #include <iostream>
 #include <cstring>
 #include <cstdio>
