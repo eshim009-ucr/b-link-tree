@@ -39,7 +39,7 @@ static ErrorCode alloc_sibling(
 		sibling->node = mem_read_trylock(sibling->addr, memory, &success);
 		if (success && sibling->node.keys[0] == INVALID) {
 			break;
-		} else {
+		} else if (success) {
 			mem_unlock(sibling->addr, memory);
 		}
 	}

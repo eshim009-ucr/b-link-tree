@@ -24,7 +24,7 @@ TEST(InitTest, Tree) {
 	bptr_t root = 0;
 	mem_reset_all(memory);
 
-	for (bptr_t i = 0; i < MAX_LEVELS * MAX_NODES_PER_LEVEL; ++i) {
+	for (bptr_t i = 0; i < MEM_SIZE; ++i) {
 		Node n = mem_read(i, memory);
 		for (li_t j = 0; j < TREE_ORDER; ++j) {
 			EXPECT_EQ(n.keys[j], INVALID);
