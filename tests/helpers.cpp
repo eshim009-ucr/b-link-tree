@@ -11,7 +11,6 @@ extern "C" {
 #include <pthread.h>
 #include <gtest/gtest.h>
 
-#include <fcntl.h>
 
 void *stride_insert(void *argv) {
 	ErrorCode status;
@@ -22,7 +21,7 @@ void *stride_insert(void *argv) {
 		for (int_fast32_t i = args->start; i <= args->end; i += args->stride) {
 			value.data = -i;
 			status = insert(args->root, i, value, memory);
-			//dump_node_list(args->log_stream, memory);
+			dump_node_list(args->log_stream, memory);
 			if (status != SUCCESS) {
 				EXPECT_EQ(status, SUCCESS)
 					<< "insert(" << i << ", " << -i << ") threw "
@@ -36,7 +35,7 @@ void *stride_insert(void *argv) {
 		for (int_fast32_t i = args->start; i >= args->end; i += args->stride) {
 			value.data = -i;
 			status = insert(args->root, i, value, memory);
-			//dump_node_list(args->log_stream, memory);
+			dump_node_list(args->log_stream, memory);
 			if (status != SUCCESS) {
 				EXPECT_EQ(status, SUCCESS)
 					<< "insert(" << i << ", " << -i << ") threw "
