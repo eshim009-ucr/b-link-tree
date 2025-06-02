@@ -43,7 +43,7 @@ TEST(ParallelTest, InterleavedAscending) {
 	even_args.start = 2;
 	system("mkdir -p thread-logs");
 
-	for (uint_fast8_t i = 0; i < PARALLEL_RERUNS; ++i) {
+	for (uint_fast16_t i = 0; i < PARALLEL_RERUNS; ++i) {
 		fprintf(log_stream, "Run %d\n", i+1);
 		root = 0;
 		mem_reset_all(memory);
@@ -95,7 +95,7 @@ TEST(ParallelTest, InterleavedDescending) {
 	}
 	system("mkdir -p thread-logs");
 
-	for (uint_fast8_t i = 0; i < PARALLEL_RERUNS; ++i) {
+	for (uint_fast16_t i = 0; i < PARALLEL_RERUNS; ++i) {
 		fprintf(log_stream, "Run %d\n", i+1);
 		root = 0;
 		mem_reset_all(memory);
@@ -145,7 +145,7 @@ TEST(ParallelTest, CrossfadeInsert) {
 	even_args.stride = -odd_args.stride;
 	system("mkdir -p thread-logs");
 
-	for (uint_fast8_t i = 0; i < PARALLEL_RERUNS; ++i) {
+	for (uint_fast16_t i = 0; i < PARALLEL_RERUNS; ++i) {
 		fprintf(log_stream, "Run %d\n", i+1);
 		root = 0;
 		mem_reset_all(memory);
