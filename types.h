@@ -25,6 +25,18 @@ typedef uint_fast8_t li_t;
 typedef uint_fast16_t li_t;
 #elif TREE_ORDER < (1 << 32)
 typedef uint_fast32_t li_t;
+#else
+typedef uint_fast64_t li_t;
+#endif
+//! Datatype of tree level
+#if MAX_LEVELS < (1 << 8)
+typedef uint_fast8_t blvl_t;
+#elif MAX_LEVELS < (1 << 16)
+typedef uint_fast16_t blvl_t;
+#elif MAX_LEVELS < (1 << 32)
+typedef uint_fast32_t blvl_t;
+#else
+typedef uint_fast64_t blvl_t;
 #endif
 //! Explanation: https://en.wikipedia.org/wiki/X_macro
 #define ERROR_CODE_XMACRO \

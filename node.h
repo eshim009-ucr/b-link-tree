@@ -67,11 +67,37 @@ inline static bool is_leaf(bptr_t addr) {
 	return addr < MAX_LEAVES;
 }
 
+inline static uint_fast64_t int_pow(uint_fast16_t base, uint_fast8_t power) {
+	uint_fast64_t tmp = 1;
+	for (uint_fast8_t i = 0; i < power; ++i) {
+		tmp *= base;
+	}
+	return tmp;
+}
+
+inline static bptr_t level_start(blvl_t level) {
+	return (1 - int_pow(TREE_ORDER, level)) / (1 - TREE_ORDER);
+}
+
+inline static bptr_t level_width(blvl_t level) {
+	return int_pow(TREE_ORDER, level);
+}
+
 //! @brief Check which level of the tree a node address resides on
 //! Assumes all levels take up equal space in memory
 //! @param[in] node_ptr  The node address to check
-inline static bptr_t get_level(bptr_t node_ptr) {
-	return (node_ptr / MAX_NODES_PER_LEVEL);
+inline static uint_fast16_t get_level(bptr_t node_ptr) {
+	// Root level starts at 0 and only has one node
+	// Next level starts at 1
+	bptr_t start = 1;
+	for (blvl_t level = 1; level < MAX_LEVELS; ++level) {
+		// We overshot, so the last level was the right one
+		if (node_ptr < start) {
+			return level - 1;
+		}
+		last_start += level_width(level);
+	}
+	return INVALID;
 }
 
 
