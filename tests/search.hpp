@@ -85,7 +85,7 @@ TEST(SearchTest, OneInternal) {
 	rchild.node.keys[2] = 10; rchild.node.values[2].data = -10;
 	rchild.node.keys[3] = 11; rchild.node.values[3].data = -11;
 	mem_write(root.addr, &root.node, memory);
-	mem_write(lchild.addr, &rchild.node, memory);
+	mem_write(lchild.addr, &lchild.node, memory);
 	mem_write(rchild.addr, &rchild.node, memory);
 	dump_node_list(log_stream, memory);
 	EXPECT_EQ(search(root.addr, 0, memory).status, NOT_FOUND);
