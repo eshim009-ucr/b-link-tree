@@ -46,5 +46,7 @@ Node empty_node() {
 	for (li_t i = 0; i < TREE_ORDER; ++i) {
 		empty.keys[i] = INVALID;
 	}
+	empty.next = INVALID;
+	empty.lock = LOCK_INIT;
 	return empty;
 }

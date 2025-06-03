@@ -80,7 +80,7 @@ ErrorCode insert(bptr_t *root, bkey_t v, bval_t w, Node *memory) {
 	while (!is_leaf(current)) {
 		t = current;
 		if (!scannode(v, &A, &current)) {
-			assert(stack_ptr<MAX_LEVELS);
+			assert(stack_ptr < MAX_LEVELS);
 			/* Remember node at that level */
 			stack[stack_ptr++] = t;
 		}
@@ -121,9 +121,9 @@ ErrorCode insert(bptr_t *root, bkey_t v, bval_t w, Node *memory) {
 		bptr_t oldnode = current;
 		v = y;
 		w.ptr = u;
-		assert(stack_ptr>=0);
+		assert(stack_ptr > 0);
 		/* Backtrack */
-		current = stack[stack_ptr--];
+		current = stack[--stack_ptr];
 		/* Well ordered */
 		mem_lock(current, memory);
 		A = mem_read(current, memory);
