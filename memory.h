@@ -14,7 +14,7 @@ typedef struct AddrNode AddrNode;
 Node mem_read(bptr_t address, Node const *memory);
 
 //! @brief Write a node to memory without touching any locks
-void mem_write(bptr_t address, Node const *node, Node *memory);
+void mem_write(bptr_t address, Node *node, Node *memory);
 
 void mem_lock(bptr_t address, Node *memory);
 

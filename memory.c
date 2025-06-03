@@ -23,10 +23,11 @@ Node mem_read(bptr_t address, Node const *memory) {
 	return memory[address];
 }
 
-void mem_write(bptr_t address, Node const *node, Node *memory) {
+void mem_write(bptr_t address, Node *node, Node *memory) {
 	assert(address < MEM_SIZE);
 	memory[address] = *node;
 }
+
 
 void mem_lock(bptr_t address, Node *memory) {
 #ifndef OPTIMISTIC_LOCK
@@ -35,9 +36,10 @@ void mem_lock(bptr_t address, Node *memory) {
 #endif
 }
 
-
 bool mem_trylock(bptr_t address, Node *memory) {
+#ifndef OPTIMISTIC_LOCK
 	return test_and_set(LCKPTR_AT_ADDR(address)) == 0;
+#endif
 }
 
 void mem_unlock(bptr_t address, Node *memory) {
