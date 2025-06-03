@@ -26,14 +26,14 @@ TEST(SearchTest, RootIsLeaf) {
 	AddrNode root;
 	root.addr = 0;
 	mem_reset_all(memory);
-	root.node = mem_read_lock(root.addr, memory);
+	root.node = mem_read(root.addr, memory);
 	bstatusval_t result;
 
 	root.node.keys[0] = 1; root.node.values[0].data = -1;
 	root.node.keys[1] = 2; root.node.values[1].data = -2;
 	root.node.keys[2] = 4; root.node.values[2].data = -4;
 	root.node.keys[3] = 5; root.node.values[3].data = -5;
-	mem_write_unlock(&root, memory);
+	mem_write(root.addr, &root.node, memory);
 	dump_node_list(log_stream, memory);
 	EXPECT_EQ(search(root.addr, 0, memory).status, NOT_FOUND);
 	EXPECT_EQ(search(root.addr, 3, memory).status, NOT_FOUND);
@@ -68,9 +68,9 @@ TEST(SearchTest, OneInternal) {
 	AddrNode root;
 	root.addr = MAX_LEAVES;
 	mem_reset_all(memory);
-	root.node = mem_read_lock(root.addr, memory);
-	AddrNode lchild = {.node = mem_read_lock(0, memory), .addr = 0};
-	AddrNode rchild = {.node = mem_read_lock(1, memory), .addr = 1};
+	root.node = mem_read(root.addr, memory);
+	AddrNode lchild = {.node = mem_read(0, memory), .addr = 0};
+	AddrNode rchild = {.node = mem_read(1, memory), .addr = 1};
 	bstatusval_t result;
 
 	root.node.keys[0] = 6; root.node.values[0].ptr = 0;
@@ -84,9 +84,9 @@ TEST(SearchTest, OneInternal) {
 	rchild.node.keys[1] = 8; rchild.node.values[1].data = -8;
 	rchild.node.keys[2] = 10; rchild.node.values[2].data = -10;
 	rchild.node.keys[3] = 11; rchild.node.values[3].data = -11;
-	mem_write_unlock(&root, memory);
-	mem_write_unlock(&lchild, memory);
-	mem_write_unlock(&rchild, memory);
+	mem_write(root.addr, &root.node, memory);
+	mem_write(lchild.addr, &rchild.node, memory);
+	mem_write(rchild.addr, &rchild.node, memory);
 	dump_node_list(log_stream, memory);
 	EXPECT_EQ(search(root.addr, 0, memory).status, NOT_FOUND);
 	EXPECT_EQ(search(root.addr, 3, memory).status, NOT_FOUND);

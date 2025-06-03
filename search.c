@@ -1,22 +1,30 @@
 #include "search.h"
 #include "memory.h"
+#include "util.h"
 #include "node.h"
 
 
-bstatusval_t search(bptr_t root, bkey_t key, Node const *memory) {
-	bstatusval_t result;
-	AddrNode n;
-	n.addr = root;
 
-	// Iterate until we hit a leaf
-	while (!is_leaf(n.addr)) {
-		n.node = mem_read(n.addr, memory);
-		result = find_next(&n.node, key);
-		if (result.status != SUCCESS) return result;
-		n.addr = result.value.ptr;
-	}
+bstatusval_t search(bptr_t root, bkey_t v, Node const *memory) {
+	bptr_t current = root;
+	Node A = mem_read(current, memory);
 
-	// Search within the leaf node of the lineage for the key
-	n.node = mem_read(n.addr, memory);
-	return find_value(&n.node, key);
+	/* Scan through tree */
+	while (!is_leaf(current)) {
+		/* Find correct (maybe link) ptr */
+		current = scannode(v, &A);
+		/* Read node into memory */
+		A = mem_read(current, memory);
+	} /* Now we have reached leaves. */
+
+	/* while t <- scannode(v, A) = link ptr of a A do */
+	/* Keep moving right if necessary */
+	bptr_t t;
+	while ((t = scannode(v, &A)) == A.next) {
+		current = t;
+		A = mem_read(current, memory);
+	} /* Now we have the leaf node in which u should exist. */
+
+	/* if v is in A then done "success" else done "failure"; */
+	return get_value(v, &A);
 }

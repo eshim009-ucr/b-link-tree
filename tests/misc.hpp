@@ -24,7 +24,7 @@ TEST(InitTest, Tree) {
 	bptr_t root = 0;
 	mem_reset_all(memory);
 
-	for (bptr_t i = 0; i < MAX_LEVELS * MAX_NODES_PER_LEVEL; ++i) {
+	for (bptr_t i = 0; i < MEM_SIZE; ++i) {
 		Node n = mem_read(i, memory);
 		for (li_t j = 0; j < TREE_ORDER; ++j) {
 			EXPECT_EQ(n.keys[j], INVALID);
@@ -45,16 +45,16 @@ TEST(ValidateTest, RootOneChild) {
 	AddrNode root;
 	root.addr = MAX_LEAVES;
 	mem_reset_all(memory);
-	root.node = mem_read_lock(root.addr, memory);
-	AddrNode lchild = {.node = mem_read_lock(0, memory), .addr = 0};
+	root.node = mem_read(root.addr, memory);
+	AddrNode lchild = {.node = mem_read(0, memory), .addr = 0};
 
 	root.node.keys[0] = 6; root.node.values[0].ptr = 0;
 	lchild.node.keys[0] = 1; lchild.node.values[0].data = -1;
 	lchild.node.keys[1] = 2; lchild.node.values[1].data = -2;
 	lchild.node.keys[2] = 4; lchild.node.values[2].data = -4;
 	lchild.node.keys[3] = 5; lchild.node.values[3].data = -5;
-	mem_write_unlock(&root, memory);
-	mem_write_unlock(&lchild, memory);
+	mem_write(root.addr, &root.node, memory);
+	mem_write(lchild.addr, &lchild.node, memory);
 	dump_node_list(log_stream, memory);
 
 	EXPECT_FALSE(validate(root.addr, log_stream, memory));
