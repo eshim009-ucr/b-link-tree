@@ -29,7 +29,7 @@ bool mem_unlock(bptr_t address, Node *memory);
 void mem_unlock(bptr_t address, Node *memory);
 #endif
 
-bptr_t alloc_node();
+bptr_t alloc_node(Node *node, bptr_t start, bptr_t end, Node *memory);
 
 //! @brief Reset memory to a slate of blank nodes
 //!

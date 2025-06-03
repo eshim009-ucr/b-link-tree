@@ -49,13 +49,13 @@ void mem_unlock(bptr_t address, Node *memory) {
 #endif
 }
 
-
-bptr_t alloc_node(Node *memory) {
-	for (bptr_t i = 0; i < MEM_SIZE; ++i) {
+bptr_t alloc_node(Node *node, bptr_t start, bptr_t end, Node *memory) {
+	for (bptr_t i = start; i < end; ++i) {
 		if (mem_trylock(i, memory)) {
 			return i;
 		}
 	}
+	assert(0);
 	return INVALID;
 }
 

@@ -48,7 +48,9 @@ static void node_insert(Node *A, bval_t w, bkey_t v) {
 	assert(0);
 }
 
-static bkey_t divide(Node *A, bval_t w, bkey_t v, Node *B, bptr_t u) {
+
+//! @return which node got the new entry
+static int divide(Node *A, bval_t w, bkey_t v, Node *B, bptr_t u) {
 	// Adjust next node pointers
 	B->next = A->next;
 	A->next = u;
@@ -58,12 +60,12 @@ static bkey_t divide(Node *A, bval_t w, bkey_t v, Node *B, bptr_t u) {
 		B->values[i] = A->values[i + (TREE_ORDER/2)];
 		A->keys[i + (TREE_ORDER/2)] = INVALID;
 	}
-	if (A->keys[TREE_ORDER/2] < v) {
+	if (A->keys[(TREE_ORDER/2)-1] < v) {
 		node_insert(B, w, v);
-		return A->keys[TREE_ORDER/2];
+		return 1;
 	} else {
 		node_insert(A, w, v);
-		return A->keys[(TREE_ORDER/2)+1];
+		return 0;
 	}
 }
 
@@ -86,6 +88,7 @@ ErrorCode insert(bptr_t *root, bkey_t v, bval_t w, Node *memory) {
 		}
 		A = mem_read(current, memory);
 	}
+	bool leaf = true;
 	
 	/* We have a candidate leaf */
 	mem_lock(current, memory);
@@ -108,27 +111,51 @@ ErrorCode insert(bptr_t *root, bkey_t v, bval_t w, Node *memory) {
 		return SUCCESS;
 	} else {
 		Node B = empty_node();
-		bptr_t u = alloc_node();
+		bptr_t u = leaf ?
+			alloc_node(&B, 0, MAX_LEAVES, memory) :
+			alloc_node(&B, MAX_LEAVES, MEM_SIZE, memory);
 		/* A, B <- rearrange old A, adding v and w, to make 2 nodes,
 		 * where (link ptr of A, linkptr of B) <- (u, linkptr of old A); */
 		/* y <- max value stored in new A; *//* For insertion into parent */
-		bptr_t y = divide(&A, w, v, &B, u);
+		bkey_t y, B_max;
+		if (divide(&A, w, v, &B, u)) {
+			y = A.keys[(TREE_ORDER/2)-1];
+			B_max = B.keys[TREE_ORDER/2];
+		} else {
+			y = A.keys[TREE_ORDER/2];
+			B_max = B.keys[(TREE_ORDER/2)-1];
+		}
 		/* Insert B before A */
 		mem_write(u, &B, memory);
 		/* Instantaneous change of 2 nodes */
 		mem_write(current, &A, memory);
 		/* Now insert pointer in parent */
 		bptr_t oldnode = current;
-		v = y;
+		v = B_max;
 		w.ptr = u;
-		assert(stack_ptr > 0);
-		/* Backtrack */
-		current = stack[--stack_ptr];
-		/* Well ordered */
-		mem_lock(current, memory);
-		A = mem_read(current, memory);
-		move_right(&t, &v, &A, &current, memory);
+		// Out of parents, need to create a new one
+		if (stack_ptr == 0) {
+			// Initialize blank parent
+			Node parent = empty_node();
+			// Insert a pointer to A
+			node_insert(&parent, (bval_t) current, y);
+			// Adjust A for next iteration
+			A = parent;
+			// Reserve a memory slot for the new parent
+			current = alloc_node(&parent, MAX_LEAVES, MEM_SIZE, memory);
+			mem_write(current, &A, memory);
+			*root = current;
+			// Pointer to B will be inserted on next iteration
+		} else {
+			/* Backtrack */
+			current = stack[--stack_ptr];
+			/* Well ordered */
+			mem_lock(current, memory);
+			A = mem_read(current, memory);
+			move_right(&t, &v, &A, &current, memory);
+		}
 		mem_unlock(oldnode, memory);
+		leaf = false;
 		/* And repeat procedure for parent */
 		goto Doinsertion;
 	}

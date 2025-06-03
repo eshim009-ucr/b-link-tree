@@ -30,6 +30,8 @@ struct Node {
 	//! These may be leaf data or pointers within the tree.
 	bptr_t next;
 	//! @brief Used to restrict concurrent modifications to this node
+	//! @warning Some code is written with the assumption that the lock is the
+	//           last field in this struct, update struct members with caution
 	lock_t lock;
 };
 typedef struct Node Node;
