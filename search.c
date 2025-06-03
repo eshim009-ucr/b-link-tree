@@ -12,7 +12,7 @@ bstatusval_t search(bptr_t root, bkey_t v, Node const *memory) {
 	/* Scan through tree */
 	while (!is_leaf(current)) {
 		/* Find correct (maybe link) ptr */
-		current = scannode(v, &A);
+		(void) scannode(v, &A, &current);
 		/* Read node into memory */
 		A = mem_read(current, memory);
 	} /* Now we have reached leaves. */
@@ -20,7 +20,7 @@ bstatusval_t search(bptr_t root, bkey_t v, Node const *memory) {
 	/* while t <- scannode(v, A) = link ptr of a A do */
 	/* Keep moving right if necessary */
 	bptr_t t;
-	while ((t = scannode(v, &A)) == A.next) {
+	while (scannode(v, &A, &t)) {
 		current = t;
 		A = mem_read(current, memory);
 	} /* Now we have the leaf node in which u should exist. */

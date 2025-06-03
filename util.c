@@ -15,11 +15,12 @@ bstatusval_t get_value(bkey_t v, Node const *A) {
 }
 
 
-bptr_t scannode(bkey_t v, Node const *A) {
+bool scannode(bkey_t v, Node const *A, bptr_t *result) {
 	li_t i;
 	for (i = 0; i < TREE_ORDER; ++i) {
 		if (A->keys[i] >= v) {
-			return A->values[i].ptr;
+			*result = A->values[i].ptr;
+			return false;
 		} else if (A->keys[i] == INVALID) {
 			break;
 		}
@@ -33,10 +34,11 @@ bptr_t scannode(bkey_t v, Node const *A) {
 	 * following the link pointer of the newly split node instead of by
 	 * following a child pointer as it would ordinarily do. */
 	if (A->keys[i-1] < v) {
-		return A->next;
+		*result = A->next;
+		return A->next != INVALID;
 	}
 	assert(0);
-	return INVALID;
+	return false;
 }
 
 Node empty_node() {

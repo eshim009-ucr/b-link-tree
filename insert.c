@@ -7,7 +7,7 @@
 inline static void move_right(bkey_t *t, bkey_t *v, Node *A, bkey_t *current, Node *memory) {
 	/* Move right if necessary */
 	/* while t <- scannode(v, A) is a link pointer of A do */
-	while ((*t = scannode(*v, A)) == A->next) {
+	while (scannode(*v, A, t)) {
 		/* Note left-to-right locking */
 		mem_lock(*t, memory);
 		mem_unlock(*current, memory); 
@@ -79,8 +79,7 @@ ErrorCode insert(bptr_t *root, bkey_t v, bval_t w, Node *memory) {
 	/* Scan down tree */
 	while (!is_leaf(current)) {
 		t = current;
-		current = scannode(v, &A);
-		if (current != A.next) {
+		if (!scannode(v, &A, &current)) {
 			assert(stack_ptr<MAX_LEVELS);
 			/* Remember node at that level */
 			stack[stack_ptr++] = t;
