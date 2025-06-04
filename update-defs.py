@@ -69,6 +69,10 @@ f"""Usage:
 		MAX_LEAVES = "MAX_NODES_PER_LEVEL"
 	print(f"MAX_LEAVES = {MAX_LEAVES}")
 
+	MEM_SIZE_square = MAX_NODES_PER_LEVEL * MAX_LEVELS
+	MEM_SIZE = "(MAX_NODES_PER_LEVEL * MAX_LEVELS)"
+	print(f"MEM_SIZE (rectangular) = {MEM_SIZE_square}")
+
 	# Update file in place
 	print("Updating file...", end="")
 	with open("defs.h", "r") as fin:
