@@ -81,11 +81,13 @@ void dump_node_list(FILE *stream, Node const *memory) {
 		fprintf(stream, "%2u ", r*MAX_NODES_PER_LEVEL);
 		#pragma GCC diagnostic pop
 		for (c = 0; c < MAX_NODES_PER_LEVEL; ++c) {
+			if (r*MAX_NODES_PER_LEVEL + c >= MEM_SIZE) break;
 			n = memory[r*MAX_NODES_PER_LEVEL + c];
 			dump_keys(stream, &n);
 		}
 		fprintf(stream, "\n   ");
 		for (c = 0; c < MAX_NODES_PER_LEVEL; ++c) {
+			if (r*MAX_NODES_PER_LEVEL + c >= MEM_SIZE) break;
 			n = memory[r*MAX_NODES_PER_LEVEL + c];
 			dump_values(stream, &n);
 		}

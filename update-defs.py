@@ -23,7 +23,7 @@ LOCK_SIZE = 32//8
 def parse_size(size):
 	for suffix, multiplier in SUFFIXES.items():
 		if size.lower().endswith(suffix.lower()):
-			return int(size[:-len(suffix)]) * multiplier // NODE_SIZE
+			return int(float(size[:-len(suffix)]) * multiplier / NODE_SIZE)
 	return int(size)
 
 
