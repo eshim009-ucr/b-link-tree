@@ -15,7 +15,7 @@ DEFS=
 CFLAGS=-Wall -std=c11 -g $(addprefix -D,$(DEFS))
 CXXFLAGS=-Wall -std=c++14 -g $(addprefix -D,$(DEFS))
 # Linker Flags
-LDLIBS=-lpthread -l:$(LIB) $(if $(wildcard /usr/lib/libgtest.so),-lgtest)
+LDLIBS=-lpthread -l:$(LIB) $(if $(wildcard /usr/lib/libgtest.so /usr/lib64/libgtest.so),-lgtest)
 LDFLAGS=-L.
 # Runtime Logs
 LOG=main.log thread-logs
