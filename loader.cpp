@@ -34,8 +34,13 @@ int write_resp_file(const char *filename, std::vector<Response> const& respbuf) 
 	std::ofstream fout;
 	std::cout << "Writing response file..." << std::flush;
 	fout.open(filename, std::ofstream::binary);
-	for (Response resp : respbuf) {
-		fout.write((char*) &resp, sizeof(Response));
+	int i = 0;
+	if (fout.is_open() && fout.good()) {
+		for (Response resp : respbuf) {
+			fout.write((char*) &resp, sizeof(Response));
+		}
+	} else {
+		return 1;
 	}
 	fout.close();
 	std::cout << "Done!" << std::endl;

@@ -13,6 +13,10 @@ extern "C" {
 #define VERBOSE 1
 #endif
 
+#ifndef WRITE_OUTPUT
+#define WRITE_OUTPUT 1
+#endif
+
 
 extern Node memory[MEM_SIZE];
 
@@ -110,6 +114,23 @@ int run_from_file(int argc, char **argv) {
 		last = split;
 		std::cout << "\ncompleted in " << (1000.0d * timer/CLOCKS_PER_SEC) << "ms" << std::endl;
 	}
+
+	// Write to disk
+	// Expects filenames to end with _req.bin
+	#if WRITE_OUTPUT
+	for (uint_fast8_t i = 0; i < argc-2; ++i) {
+		std::string arg = argv[i+2];
+		if (arg == "then") {
+			offset++;
+		} else {
+			arg.replace(arg.end()-8, arg.end(), "_resp.bin");
+			if (write_resp_file(arg.c_str(), respbufs.at(i-offset))) {
+				std::cerr << "Failed to write file " << arg << std::endl;
+				return 1;
+			}
+		}
+	}
+	#endif
 
 	return 0;
 }
