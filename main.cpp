@@ -32,7 +32,7 @@ static int run_gtests(int argc, char **argv) {
 int main(int argc, char **argv) {
 #ifndef NO_GTEST
 	if (argc < 2 || strcmp(argv[1], "gtest") == 0) {
-		return run_gtests(argc-1, &argv[1]);
+		return run_gtests(argc, argv);
 	} else
 #endif
 	if (strcmp(argv[1], "exe") == 0) {
