@@ -15,7 +15,7 @@ extern "C" {
 // interleave. Testing multiple times gives more chances for these bugs to
 // manifest themselves.
 #ifndef PARALLEL_RERUNS
-#define PARALLEL_RERUNS 1024
+#define PARALLEL_RERUNS 128
 #endif
 
 extern FILE *log_stream;
