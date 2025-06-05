@@ -5,6 +5,8 @@
 #include "tests/insert.hpp"
 #include "tests/parallel.hpp"
 #include "tests/operations.hpp"
+#else
+#include "node.h"
 #endif
 #include "thread-runner.hpp"
 #include <iostream>
@@ -32,7 +34,7 @@ int main(int argc, char **argv) {
 	} else {
 #ifdef NO_GTEST
 		std::cerr << "Usage:\n\t"
-			<< argv[1] << " exe [Request File(s)]" << std::endl;
+			<< argv[0] << " exe [Request File(s)]" << std::endl;
 		return 1;
 #else
 		return run_gtests(argc, argv);
