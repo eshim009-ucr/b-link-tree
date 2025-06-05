@@ -15,8 +15,10 @@ DEFS=
 CFLAGS=-Wall -std=c11 -g $(addprefix -D,$(DEFS))
 CXXFLAGS=-Wall -std=c++14 -g $(addprefix -D,$(DEFS))
 # Linker Flags
-LDLIBS=-lgtest -lpthread -l:$(LIB)
+LDLIBS=-lpthread -l:$(LIB) $(if $(wildcard /usr/lib/libgtest.so),-lgtest)
 LDFLAGS=-L.
+# Runtime Logs
+LOG=main.log thread-logs
 
 
 ### TARGETS & RECIPES ###
@@ -28,7 +30,7 @@ lib: $(LIB)
 docs: $(SRC) $(wildcard *.h) $(wildcard tests/*.hpp)
 	cd docs && doxygen doxyfile
 clean:
-	rm -f $(OBJ) $(EXE) $(LIB)
+	rm -rf $(OBJ) $(EXE) $(LIB) $(LOG)
 # Dependencies
 main.o: main.cpp $(wildcard tests/*.hpp)
 # Manual

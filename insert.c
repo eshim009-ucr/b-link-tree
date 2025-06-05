@@ -80,7 +80,11 @@ static void split_key(Node *node, bkey_t new_key, bptr_t old_value) {
 }
 
 
+#ifdef OPTIMISTIC_LOCK
+static ErrorCode optimistic_insert(bptr_t *root, bkey_t v, bval_t w, Node *memory) {
+#else
 ErrorCode insert(bptr_t *root, bkey_t v, bval_t w, Node *memory) {
+#endif
 	/* For remembering ancestors */
 	bptr_t stack[MAX_LEVELS];
 	bptr_t stack_ptr = 0;
@@ -173,3 +177,13 @@ ErrorCode insert(bptr_t *root, bkey_t v, bval_t w, Node *memory) {
 	}
 	return -1;
 }
+
+#ifdef OPTIMISTIC_LOCK
+ErrorCode insert(bptr_t *root, bkey_t key, bval_t value, Node *memory) {
+	ErrorCode status;
+	do {
+		status = optimistic_insert(root, key, value, memory);
+	} while (status == RESTART);
+	return status;
+}
+#endif
