@@ -14,6 +14,14 @@ extern "C" {
 #endif
 
 
+#ifndef FPGA
+#define ARG_OFFSET 2
+#else
+#include "host.hpp"
+#define ARG_OFFSET 3
+#endif
+
+
 extern Node memory[MEM_SIZE];
 
 
@@ -21,11 +29,12 @@ struct ThreadArgs {
 	uint_fast8_t thread_id;
 	uint_fast8_t thread_count;
 	uint_fast32_t op_count;
-	Request* requests;
+	Request* requests __attribute__ ((aligned (4096)));
 	Response* responses;
 	bptr_t* root;
 };
 
+#ifndef FPGA
 static void *tree_thread(void *argv) {
 	ThreadArgs* args = (ThreadArgs *)argv;
 #ifdef STRIDED
@@ -45,6 +54,7 @@ static void *tree_thread(void *argv) {
 	}
 	pthread_exit(NULL);
 }
+#endif
 
 
 int run_from_file(int argc, char **argv) {
@@ -52,11 +62,11 @@ int run_from_file(int argc, char **argv) {
 	uint_fast8_t offset = 0;
 	uint_fast8_t last = 0;
 	std::vector<uint_fast8_t> then_splits;
-	std::vector<pthread_t> threads(argc-2);
-	std::vector<ThreadArgs> threads_args(argc-2);
+	std::vector<pthread_t> threads(argc-ARG_OFFSET);
+	std::vector<ThreadArgs> threads_args(argc-ARG_OFFSET);
 	// Tree data
-	std::vector<std::vector<Request>> reqbufs(argc-2);
-	std::vector<std::vector<Response>> respbufs(argc-2);
+	std::vector<std::vector<Request>> reqbufs(argc-ARG_OFFSET);
+	std::vector<std::vector<Response>> respbufs(argc-ARG_OFFSET);
 	bptr_t root = 0;
 	// Timing
 	clock_t timer;
@@ -66,13 +76,13 @@ int run_from_file(int argc, char **argv) {
 		return 1;
 	}
 
-	for (uint_fast8_t i = 0; i < argc-2; ++i) {
-		if (std::string(argv[i+2]) == "then") {
+	for (uint_fast8_t i = 0; i < argc-ARG_OFFSET; ++i) {
+		if (std::string(argv[i+ARG_OFFSET]) == "then") {
 			then_splits.push_back(i);
 			offset++;
 		} else {
-			if (read_req_file(argv[i+2], reqbufs.at(i-offset))) {
-				std::cerr << "Failed to read file " << argv[i+2] << std::endl;
+			if (read_req_file(argv[i+ARG_OFFSET], reqbufs.at(i-offset))) {
+				std::cerr << "Failed to read file " << argv[i+ARG_OFFSET] << std::endl;
 				return 1;
 			}
 			respbufs.at(i-offset).resize(reqbufs.at(i-offset).size());
@@ -83,7 +93,7 @@ int run_from_file(int argc, char **argv) {
 			threads_args.at(i-offset).root = &root;
 		}
 	}
-	then_splits.push_back(argc-2-offset);
+	then_splits.push_back(argc-ARG_OFFSET-offset);
 	last = 0;
 	for (uint_fast8_t i = 0; i < then_splits.size(); ++i) {
 		const uint_fast8_t sub_count = then_splits.at(i) - last;
@@ -98,8 +108,27 @@ int run_from_file(int argc, char **argv) {
 	mem_reset_all(memory);
 	last = 0;
 	for (uint_fast8_t split : then_splits) {
+#ifndef FPGA
 		std::cout << "Executing on " << (int) threads_args.at(last).thread_count << " threads..." << std::flush;
+#else
+		std::vector<Request, aligned_allocator<Request> > requests_vec(threads_args.at(last).op_count);
+		std::vector<Response, aligned_allocator<Response> > responses_vec(threads_args.at(last).op_count);
+		std::vector<Node, aligned_allocator<Node> > memory_vec(MEM_SIZE);
+		std::copy(
+			threads_args.at(last).requests,
+			threads_args.at(last).requests+threads_args.at(last).op_count,
+			requests_vec.begin()
+		);
+		std::copy(
+			threads_args.at(last).responses,
+			threads_args.at(last).responses+threads_args.at(last).op_count,
+			responses_vec.begin()
+		);
+		std::copy(memory, memory+MEM_SIZE, memory_vec.begin());
+		std::cout << "Executing..." << std::flush;
+#endif
 		timer = clock();
+#ifndef FPGA
 		for (uint_fast8_t i = last; i < split; ++i) {
 			pthread_create(&threads.at(i), NULL, tree_thread, (void*) &threads_args.at(i));
 		}
@@ -108,7 +137,18 @@ int run_from_file(int argc, char **argv) {
 		}
 		timer = clock() - timer;
 		last = split;
+#else
+		run_fpga_tree(requests_vec, responses_vec, memory_vec, std::string(argv[2]));
+#endif
 		std::cout << "\ncompleted in " << (1000.0d * timer/CLOCKS_PER_SEC) << "ms" << std::endl;
+#ifdef FPGA
+		std::copy(
+			responses_vec.begin(),
+			responses_vec.end(),
+			threads_args.at(last).responses
+		);
+		std::copy(memory_vec.begin(), memory_vec.end(), memory);
+#endif
 	}
 
 	return 0;
