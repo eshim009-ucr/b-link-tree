@@ -1,108 +1,65 @@
 #!/bin/sh
+set -e
 
 
-RERUNS=1
+RERUNS=4
+# 10^X
+SZ_EMIN=3
+SZ_EMAX=6
+SZ_MAX=$(( 10 ** $SZ_EMAX ))
+SAFE_SZ_MAX=$(( 2 * $SZ_MAX ))
+# 2^X
+M_EMIN=2
+M_EMAX=7
 
 
-echo 'Generating Testing Binary...'
-make clean
-make -j
+for m_exp in `seq $M_EMIN $M_EMAX`; do
+	m=$(( 2 ** $m_exp ))
+	echo ' _________________________________'
+	echo '/                                 \'
+	printf '| BRANCHING FACTOR of 2^%2d = %4d |\n' $m_exp $m
+	echo '\_________________________________/'
+	./update-defs.py $m $SAFE_SZ_MAX
 
-echo 'Generating Benchmark Files...'
-cd benchmark
-make clean all
-./gen-bench
+	echo 'Generating Testing Binary...'
+	make clean
+	make -j
 
-
-echo '=== INSERT PARALLELISM ==='
-echo '--- 1 Thread ---'
-for i in `seq $RERUNS`; do
-	echo " -  Run $i/$RERUNS  - "
-	../blink exe insert_random_req.bin
-done
-echo '--- 2 Threads ---'
-for i in `seq $RERUNS`; do
-	echo " -  Run $i/$RERUNS  - "
-	../blink exe insert_random_1-of-2_req.bin insert_random_2-of-2_req.bin
-done
-echo '--- 4 Threads ---'
-for i in `seq $RERUNS`; do
-	echo " -  Run $i/$RERUNS  - "
-	../blink exe \
-		insert_random_1-of-4_req.bin insert_random_2-of-4_req.bin \
-		insert_random_3-of-4_req.bin insert_random_4-of-4_req.bin
-done
-echo '--- 8 Threads ---'
-for i in `seq $RERUNS`; do
-	 echo " -  Run $i/$RERUNS  - "
-	../blink exe \
-		insert_random_1-of-8_req.bin insert_random_2-of-8_req.bin \
-		insert_random_3-of-8_req.bin insert_random_4-of-8_req.bin \
-		insert_random_5-of-8_req.bin insert_random_6-of-8_req.bin \
-		insert_random_7-of-8_req.bin insert_random_8-of-8_req.bin
-done
+	echo 'Generating Benchmark Files...'
+	cd benchmark
+	make clean all
+	./gen-bench
 
 
-echo '=== SEARCH PARALLELISM ==='
-echo '--- 1 Thread ---'
-for i in `seq $RERUNS`; do
-	echo " -  Run $i/$RERUNS  - "
-	../blink exe insert_random_req.bin then search_random_req.bin
-done
-echo '--- 2 Threads ---'
-for i in `seq $RERUNS`; do
-	echo " -  Run $i/$RERUNS  - "
-	../blink exe insert_random_req.bin then \
-		search_random_1-of-2_req.bin search_random_2-of-2_req.bin
-done
-echo '--- 4 Threads ---'
-for i in `seq $RERUNS`; do
-	echo " -  Run $i/$RERUNS  - "
-	../blink exe insert_random_req.bin then \
-		search_random_1-of-4_req.bin search_random_2-of-4_req.bin \
-		search_random_3-of-4_req.bin search_random_4-of-4_req.bin
-done
-echo '--- 8 Threads ---'
-for i in `seq $RERUNS`; do
-	 echo " -  Run $i/$RERUNS  - "
-	../blink exe insert_random_req.bin then \
-		search_random_1-of-8_req.bin search_random_2-of-8_req.bin \
-		search_random_3-of-8_req.bin search_random_4-of-8_req.bin \
-		search_random_5-of-8_req.bin search_random_6-of-8_req.bin \
-		search_random_7-of-8_req.bin search_random_8-of-8_req.bin
-done
+	echo '=== INSERT & SEARCH ==='
+	for i in `seq $SZ_EMIN $SZ_EMAX`; do
+		echo "--- 10^$i Entries, Sequential Insert ---"
+		for j in `seq $RERUNS`; do
+			echo " -  Run $j/$RERUNS  - "
+			../blink exe "insert_sequential_1e$(echo $i)_req.bin" then \
+				"search_sequential_1e$(echo $i)_req.bin"
+		done
+		echo "--- 10^$i Entries, Random Insert ---"
+		for j in `seq $RERUNS`; do
+			echo " -  Run $j/$RERUNS  - "
+			../blink exe "insert_random_1e$(echo $i)_req.bin" then \
+				"search_random_1e$(echo $i)_req.bin"
+		done
+	done
 
 
-echo '=== READ/WRITE DOMINANCE ==='
-echo '--- 20% Read, 80% Write ---'
-for i in `seq $RERUNS`; do
-	 echo " -  Run $i/$RERUNS  - "
-	../blink exe insert_random_1-of-4_req.bin then \
-		search_random_1-of-5_req.bin insert_random_2-of-5_req.bin \
-		insert_random_3-of-5_req.bin insert_random_4-of-5_req.bin \
-		insert_random_5-of-5_req.bin
-done
-echo '--- 40% Read, 60% Write ---'
-for i in `seq $RERUNS`; do
-	 echo " -  Run $i/$RERUNS  - "
-	../blink exe insert_random_1-of-4_req.bin then \
-		search_random_1-of-5_req.bin search_random_2-of-5_req.bin \
-		insert_random_3-of-5_req.bin insert_random_4-of-5_req.bin \
-		insert_random_5-of-5_req.bin
-done
-echo '--- 60% Read, 40% Write ---'
-for i in `seq $RERUNS`; do
-	 echo " -  Run $i/$RERUNS  - "
-	../blink exe insert_random_1-of-4_req.bin then \
-		search_random_1-of-5_req.bin search_random_2-of-5_req.bin \
-		search_random_3-of-5_req.bin insert_random_4-of-5_req.bin \
-		insert_random_5-of-5_req.bin
-done
-echo '--- 80% Read, 20% Write ---'
-for i in `seq $RERUNS`; do
-	 echo " -  Run $i/$RERUNS  - "
-	../blink exe insert_random_1-of-4_req.bin then \
-		search_random_1-of-5_req.bin search_random_2-of-5_req.bin \
-		search_random_3-of-5_req.bin search_random_4-of-5_req.bin \
-		insert_random_5-of-5_req.bin
+	echo '=== READ/WRITE DOMINANCE ==='
+	for r_ratio in $(seq 20 20 80); do
+		w_ratio=$((100 - $r_ratio))
+		echo "--- $r_ratio% Read, $w_ratio% Write ---"
+		for i in `seq $SZ_EMIN $SZ_EMAX`; do
+			for j in `seq $RERUNS`; do
+				echo " -  10^$i Entries, Run $j/$RERUNS  - "
+				../blink exe "insert_random_1e$(echo $i)_req.bin" then \
+					"mixed-rw_$r_ratio-$(echo $w_ratio)_1e$(echo $i)_req.bin"
+			done
+		done
+	done
+
+	cd ..
 done

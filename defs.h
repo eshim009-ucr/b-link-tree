@@ -7,16 +7,16 @@
 #endif
 //! Maximum number of nodes that can be stored in a tree's memory
 #ifndef MEM_SIZE
-#define MEM_SIZE 25000000
+#define MEM_SIZE (MAX_NODES_PER_LEVEL * MAX_LEVELS)
 #endif
 //! Maximum height of a tree
 #ifndef MAX_LEVELS
-#define MAX_LEVELS 13
+#define MAX_LEVELS 3
 #endif
 //! "Width" of a memory grid
 //! Each level of the tree is on its own level
 #ifndef MAX_NODES_PER_LEVEL
-#define MAX_NODES_PER_LEVEL 16777216
+#define MAX_NODES_PER_LEVEL 16
 #endif
 //! Maximum number of leaf nodes in the entire tree
 #ifndef MAX_LEAVES

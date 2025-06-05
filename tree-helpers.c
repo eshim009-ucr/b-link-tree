@@ -21,8 +21,14 @@ ErrorCode trace_lineage(bptr_t root, bkey_t key, bptr_t *lineage, Node const *me
 	while (!is_leaf(lineage[curr])) {
 		node = mem_read(lineage[curr], memory);
 		result = find_next(&node, key);
-		if (result.status != SUCCESS) return result.status;
-		lineage[++curr] = result.value.ptr;
+		switch (result.status) {
+			case SUCCESS:
+				curr++;
+				if (curr >= MAX_LEVELS) return OUT_OF_MEMORY;
+			case PARENT_FULL: break;
+			default: return result.status;
+		}
+		lineage[curr] = result.value.ptr;
 	}
 
 	return SUCCESS;

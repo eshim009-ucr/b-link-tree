@@ -20,7 +20,7 @@ extern "C" {
 
 extern FILE *log_stream;
 extern Node memory[MEM_SIZE];
-constexpr uint_fast32_t KEY_MAX = (TREE_ORDER/2)*(MAX_LEAVES+1);
+constexpr uint_fast32_t KEY_MAX = 22;
 
 
 TEST(ParallelTest, InterleavedAscending) {

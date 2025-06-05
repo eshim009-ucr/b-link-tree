@@ -7,7 +7,7 @@
 #include <assert.h>
 #include <string.h>
 
-#ifdef OPTIMISTIC_LOCK
+#if defined(OPTIMISTIC_LOCK) || defined(UNLOCKED)
 	#include <stdint.h>
 	typedef uint_fast32_t lock_t;
 	#define LOCK_INIT 0
@@ -71,6 +71,8 @@ static inline void lock_p(lock_t *lock) {
 		#else
 			pthread_mutex_lock(lock);
 		#endif
+	#else
+	*lock = 1;
 	#endif
 }
 
@@ -83,6 +85,8 @@ static inline void lock_v(lock_t *lock) {
 		#else
 			assert(pthread_mutex_unlock(lock) == 0);
 		#endif
+	#else
+	*lock = 0;
 	#endif
 }
 #endif
