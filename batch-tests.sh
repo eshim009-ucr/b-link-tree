@@ -56,7 +56,7 @@ for m_exp in `seq $M_EMIN $M_EMAX`; do
 			for j in `seq $RERUNS`; do
 				echo " -  10^$i Entries, Run $j/$RERUNS  - "
 				../blink exe "insert_random_1e$(echo $i)_req.bin" then \
-					"mixed-rw_$r_ratio-$(echo $w_ratio)_$i-of-$(echo $BATCHES)_req.bin"
+					"mixed-rw_$r_ratio-$(echo $w_ratio)_1e$(echo $i)_req.bin"
 			done
 		done
 	done
