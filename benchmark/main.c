@@ -75,7 +75,7 @@ int main(int argc, int **argv) {
 		reqbuf[i].opcode = SEARCH;
 	}
 	for (uint_fast8_t i = MIN_EXP; i <= MAX_EXP; ++i) {
-		sprintf(strbuf, "search_sequential_1e%d_req.bin", i);
+		sprintf(strbuf, "search_random_1e%d_req.bin", i);
 		fout = fopen(strbuf, "wb");
 		fwrite(reqbuf, sizeof(Request), int_pow(10,i), fout);
 		fclose(fout);

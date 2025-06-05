@@ -11,7 +11,7 @@ OBJ=$(OBJ_C) $(OBJ_CPP)
 EXE=blink
 LIB=blink.a
 # Compiler Flags
-DEFS=
+DEFS=UNLOCKED
 CFLAGS=-Wall -std=c11 -g $(addprefix -D,$(DEFS))
 CXXFLAGS=-Wall -std=c++14 -g $(addprefix -D,$(DEFS))
 # Linker Flags
