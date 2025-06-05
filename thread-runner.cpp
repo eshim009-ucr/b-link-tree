@@ -9,6 +9,11 @@ extern "C" {
 #include <stdint.h>
 
 
+#ifndef VERBOSE
+#define VERBOSE 1
+#endif
+
+
 extern Node memory[MEM_SIZE];
 
 
@@ -28,6 +33,13 @@ static void *tree_thread(void *argv) {
 #else // BLOCKED
 	const uint_fast64_t BLOCK_SIZE = args->op_count/args->thread_count;
 	for (uint_fast64_t i = args->thread_id * BLOCK_SIZE; i < (args->thread_id+1)*BLOCK_SIZE; ++i) {
+#if VERBOSE
+		if (i != 0 && i % 10000 == 0) {
+			std::cout << "\n\t(" << (int) args->thread_id
+				<< ") Executed " << i << '/' << BLOCK_SIZE
+				<< " (" << (100.0*i/BLOCK_SIZE) << "%) requests";
+		}
+#endif
 #endif
 		args->responses[i] = execute_req(args->requests[i], args->root, memory);
 	}
