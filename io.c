@@ -94,3 +94,44 @@ void dump_node_list(FILE *stream, Node const *memory) {
 	fprintf(stream, "\n");
 	fflush(stream);
 }
+
+void dump_gv(FILE *stream, Node const *memory) {
+	fprintf(stream, "digraph g {\n");
+	fprintf(stream, "\tnode [shape=record];\n");
+	for (bptr_t i = 0; i < MEM_SIZE; ++i) {
+		if (memory[i].keys[0] == INVALID) continue;
+		// Nodes
+		fprintf(stream, "\tnode%d[label = \"", i);
+		for (li_t j = 0; j < TREE_ORDER; ++j) {
+			if (memory[i].keys[j] == INVALID) {
+				fprintf(stream, "{|}|");
+			} else {
+				fprintf(stream, "{%d|<k%d>0x%x}|",
+					memory[i].keys[j], j, memory[i].values[j]);
+			}
+		}
+		if (memory[i].next != INVALID) {
+			fprintf(stream, "{<k%d>0x%x|%s}\"];\n",
+				TREE_ORDER, memory[i].next,
+				lock_test(&memory[i].lock) ? "LCK" : "   ");
+			fprintf(stream, "\t{rank=same;\"node%d\":k%d->\"node%d\"}\n",
+				i, TREE_ORDER, memory[i].next);
+		} else {
+			fprintf(stream, "{|%s}\"];\n",
+				lock_test(&memory[i].lock) ? "LCK" : "");
+		}
+		// Links
+		if (!is_leaf(i)) {
+			for (li_t j = 0; j < TREE_ORDER; ++j) {
+				if (memory[i].keys[j] == INVALID) {
+					break;
+				} else {
+					fprintf(stream, "\t\"node%d\":k%d->\"node%d\"\n",
+						i, j, memory[i].values[j]);
+				}
+			}
+		}
+	}
+	fprintf(stream, "}\n");
+	fflush(stream);
+}

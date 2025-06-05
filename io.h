@@ -11,4 +11,10 @@ typedef struct Node Node;
 //!                     output
 void dump_node_list(FILE *stream, Node const *memory);
 
+//! @brief Print the contents of the tree as a DOT file that can be read with
+//!        Graphviz
+//! @param[out] stream  Output stream to write to, can be a file or standard
+//!                     output
+void dump_gv(FILE *stream, Node const *memory);
+
 #endif
