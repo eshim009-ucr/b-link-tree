@@ -69,6 +69,16 @@ static int divide(Node *A, bval_t w, bkey_t v, Node *B, bptr_t u) {
 	}
 }
 
+static void split_key(Node *node, bkey_t new_key, bptr_t old_value) {
+	for (li_t i = 0; i < TREE_ORDER; ++i) {
+		if (node->values[i].ptr == old_value) {
+			node->keys[i] = new_key;
+			return;
+		}
+	}
+	assert(0);
+}
+
 
 ErrorCode insert(bptr_t *root, bkey_t v, bval_t w, Node *memory) {
 	/* For remembering ancestors */
@@ -147,12 +157,14 @@ ErrorCode insert(bptr_t *root, bkey_t v, bval_t w, Node *memory) {
 			*root = current;
 			// Pointer to B will be inserted on next iteration
 		} else {
+			bptr_t A_addr = current;
 			/* Backtrack */
 			current = stack[--stack_ptr];
 			/* Well ordered */
 			mem_lock(current, memory);
 			A = mem_read(current, memory);
 			move_right(&t, &v, &A, &current, memory);
+			split_key(&A, y, A_addr);
 		}
 		mem_unlock(oldnode, memory);
 		leaf = false;

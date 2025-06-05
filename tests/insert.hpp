@@ -127,5 +127,29 @@ TEST(InsertTest, SequentialInsert) {
 	fprintf(log_stream, "\n\n");
 }
 
+TEST(InsertTest, SequentialDescendingInsert) {
+	const testing::TestInfo* const test_info =
+		testing::UnitTest::GetInstance()->current_test_info();
+	fprintf(log_stream, "=== %s.%s ===\n",
+		test_info->test_suite_name(), test_info->name()
+	);
+
+	bptr_t root = 0;
+	bval_t value;
+	mem_reset_all(memory);
+
+	// Insert values
+	for (uint_fast8_t i = (TREE_ORDER/2)*(MAX_LEAVES+1); i>=1; --i) {
+		value.data = -i;
+		ASSERT_EQ(insert(&root, i, value, memory), SUCCESS);
+		dump_node_list(log_stream, memory);
+		ASSERT_TRUE(is_unlocked(root, log_stream, memory));
+	}
+	EXPECT_TRUE(check_inserted_leaves());
+
+	EXPECT_TRUE(validate(root, log_stream, memory));
+	fprintf(log_stream, "\n\n");
+}
+
 
 #endif
