@@ -48,9 +48,9 @@ TEST(ParallelTest, InterleavedAscending) {
 		root = 0;
 		mem_reset_all(memory);
 		sprintf(strbuf, "thread-logs/int-asc_run_%04d_%s.log", i, "odd");
-		odd_args.log_stream = fopen(strbuf, "w");
+		TRY_FOPEN(odd_args.log_stream, strbuf, "w");
 		sprintf(strbuf, "thread-logs/int-asc_run_%04d_%s.log", i, "even");
-		even_args.log_stream = fopen(strbuf, "w");
+		TRY_FOPEN(even_args.log_stream, strbuf, "w");
 
 		pthread_create(&thread_even, NULL, stride_insert, (void*) &even_args);
 		pthread_create(&thread_odd, NULL, stride_insert, (void*) &odd_args);
@@ -100,9 +100,9 @@ TEST(ParallelTest, InterleavedDescending) {
 		root = 0;
 		mem_reset_all(memory);
 		sprintf(strbuf, "thread-logs/int-des_run_%04d_%s.log", i, "odd");
-		odd_args.log_stream = fopen(strbuf, "w");
+		TRY_FOPEN(odd_args.log_stream, strbuf, "w");
 		sprintf(strbuf, "thread-logs/int-des_run_%04d_%s.log", i, "even");
-		even_args.log_stream = fopen(strbuf, "w");
+		TRY_FOPEN(even_args.log_stream, strbuf, "w");
 
 		pthread_create(&thread_even, NULL, stride_insert, (void*) &even_args);
 		pthread_create(&thread_odd, NULL, stride_insert, (void*) &odd_args);
@@ -150,9 +150,9 @@ TEST(ParallelTest, CrossfadeInsert) {
 		root = 0;
 		mem_reset_all(memory);
 		sprintf(strbuf, "thread-logs/x-fade_run_%04d_%s.log", i, "odd");
-		odd_args.log_stream = fopen(strbuf, "w");
+		TRY_FOPEN(odd_args.log_stream, strbuf, "w");
 		sprintf(strbuf, "thread-logs/x-fade_run_%04d_%s.log", i, "even");
-		even_args.log_stream = fopen(strbuf, "w");
+		TRY_FOPEN(even_args.log_stream, strbuf, "w");
 
 		pthread_create(&thread_even, NULL, stride_insert, (void*) &even_args);
 		pthread_create(&thread_odd, NULL, stride_insert, (void*) &odd_args);

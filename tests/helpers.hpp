@@ -4,6 +4,15 @@
 
 #include "../types.h"
 #include <cstdio>
+#include <cstring>
+#include <cerrno>
+
+
+#define TRY_FOPEN(result, filename, mode) \
+	result = fopen(filename, mode);\
+	if (result == NULL) std::cerr \
+		<< "Failed to open file: " << filename \
+		<< std::strerror(errno) << std::endl; \
 
 
 typedef struct Node Node;
