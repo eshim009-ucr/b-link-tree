@@ -49,10 +49,16 @@ void mem_unlock(bptr_t address, Node *memory) {
 #endif
 }
 
+inline static bool is_free(bptr_t address, Node *memory) {
+	return memory[address].keys[0] == INVALID;
+}
+
 bptr_t alloc_node(Node *node, bptr_t start, bptr_t end, Node *memory) {
 	for (bptr_t i = start; i < end; ++i) {
-		if (mem_trylock(i, memory)) {
-			return i;
+		if (is_free(i, memory)) {
+			if (mem_trylock(i, memory)) {
+				return i;
+			}
 		}
 	}
 	assert(0);
