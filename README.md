@@ -13,16 +13,10 @@ Command Line Usage
 ------------------
 
 ### Run Unit Tests
-To run the GoogleTest unit tests (if compiled in), run:
+To run the GoogleTest unit tests (if compiled in), run without arguments:
 
 ```shell
 ./blink
-```
-
-or
-
-```shell
-./blink gtest
 ```
 
 
@@ -42,7 +36,8 @@ To specify groups of threads to run separately from one another, run:
 ./blink exe file1 file2 then file3 ...
 ```
 
-This will run `file1` and `file2` in parallel, then run `file3` only after all previous request files have been processed in full.
+This will run `file1` and `file2` in parallel, then run `file3` only after all
+previous request files have been processed in full.
 
 
 Compile-Time Options

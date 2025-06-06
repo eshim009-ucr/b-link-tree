@@ -5,6 +5,8 @@
 #include "tests/insert.hpp"
 #include "tests/parallel.hpp"
 #include "tests/operations.hpp"
+#else
+#include "node.h"
 #endif
 #include "thread-runner.hpp"
 extern "C" {
@@ -30,16 +32,15 @@ static int run_gtests(int argc, char **argv) {
 
 
 int main(int argc, char **argv) {
-#ifndef NO_GTEST
-	if (argc < 2 || strcmp(argv[1], "gtest") == 0) {
-		return run_gtests(argc, argv);
-	} else
-#endif
-	if (strcmp(argv[1], "exe") == 0) {
+	if (argc > 2 && strcmp(argv[1], "exe") == 0) {
 		return run_from_file(argc, argv);
 	} else {
-		std::cerr << "Unrecognized option, \""
-			<< argv[1] << "\", valid options are: gtest, exe" << std::endl;
+#ifdef NO_GTEST
+		std::cerr << "Usage:\n\t"
+			<< argv[0] << " exe [Request File(s)]" << std::endl;
 		return 1;
+#else
+		return run_gtests(argc, argv);
+#endif
 	}
 }
