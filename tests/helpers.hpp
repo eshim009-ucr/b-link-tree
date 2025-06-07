@@ -20,13 +20,13 @@ typedef struct Node Node;
 //! @brief Argument to @ref stride_insert thread handler
 struct si_args {
 	//! First value to insert
-	int_fast32_t start;
+	int_fast64_t start;
 	//! Last value to insert,
 	//! exact value may not be inserted if stride is misaligned
-	int_fast32_t end;
+	int_fast64_t end;
 	//! Difference between the current inserted value and the next inserted
 	//! value
-	int_fast32_t stride;
+	int_fast64_t stride;
 	//! Pointer to the tree root
 	bptr_t *root;
 	//! Set by the thread, read up on return.
