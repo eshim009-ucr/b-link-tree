@@ -36,7 +36,7 @@ struct si_args {
 };
 
 
-extern Node memory[MEM_SIZE];
+extern Node* memory;
 
 //! @brief Thread function for inserting values over a range with a set interval
 //! between them

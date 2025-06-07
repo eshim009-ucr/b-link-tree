@@ -9,7 +9,7 @@ extern "C" {
 #include <stdint.h>
 
 
-extern Node memory[MEM_SIZE];
+extern Node* memory;
 
 
 struct ThreadArgs {

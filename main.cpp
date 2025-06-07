@@ -15,7 +15,7 @@
 
 
 FILE *log_stream = fopen("main.log", "w");
-Node memory[MEM_SIZE];
+Node *memory;
 
 
 #ifndef NO_GTEST
@@ -28,16 +28,45 @@ static int run_gtests(int argc, char **argv) {
 #endif
 
 
+static void on_alloc_fail() {
+	bptr_t tmp = 1000;
+	uint32_t i = 0;
+	char prefixes[] = {' ', 'k', 'M', 'G', 'T'};
+	while (tmp-1 < MEM_SIZE) {
+		i++;
+		tmp *= 1000;
+	}
+	std::cerr << "Failed to allocate "
+		<< ((double)MEM_SIZE/(tmp/1000)) << prefixes[i] << "B memory" << std::endl;
+}
+
+
 int main(int argc, char **argv) {
+	int exitstatus = 0;
 	if (argc > 2 && strcmp(argv[1], "exe") == 0) {
-		return run_from_file(argc, argv);
+		memory = (Node*) malloc(MEM_SIZE * sizeof(Node));
+		if (memory == nullptr) {
+			on_alloc_fail();
+			return 1;
+		} else {
+			exitstatus = run_from_file(argc, argv);
+			free(memory);
+		}
 	} else {
 #ifdef NO_GTEST
 		std::cerr << "Usage:\n\t"
 			<< argv[0] << " exe [Request File(s)]" << std::endl;
 		return 1;
 #else
-		return run_gtests(argc, argv);
+		memory = (Node*) malloc(MEM_SIZE * sizeof(Node));
+		if (memory == nullptr) {
+			on_alloc_fail();
+			return 1;
+		} else {
+			exitstatus = run_gtests(argc, argv);
+			free(memory);
+		}
 #endif
 	}
+	return exitstatus;
 }

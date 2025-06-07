@@ -19,7 +19,7 @@ extern "C" {
 #endif
 
 extern FILE *log_stream;
-extern Node memory[MEM_SIZE];
+extern Node* memory;
 
 
 TEST(ParallelTest, InterleavedAscending) {

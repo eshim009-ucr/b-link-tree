@@ -18,7 +18,7 @@ typedef uint_fast16_t bptr_t;
 #elif MEM_SIZE < (1ULL << 32)
 typedef uint_fast32_t bptr_t;
 #define INVALID ((bkey_t) 0xFFFFFFFF)
-#elif MEM_SIZE < (1ULL << 64)
+#elif MEM_SIZE <= (0xFFFFFFFFFFFFFFFFULL)
 typedef uint_fast64_t bptr_t;
 #define INVALID ((bkey_t) 0xFFFFFFFFFFFFFFFF)
 #else
