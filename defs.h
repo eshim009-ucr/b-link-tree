@@ -8,11 +8,11 @@
 //! "Width" of a memory grid
 //! Each level of the tree is on its own level
 #ifndef MAX_NODES_PER_LEVEL
-#define MAX_NODES_PER_LEVEL (10)
+#define MAX_NODES_PER_LEVEL (16)
 #endif
 //! Maximum height of a tree
 #ifndef MAX_LEVELS
-#define MAX_LEVELS (4)
+#define MAX_LEVELS (3)
 #endif
 //! Maximum number of leaf nodes in the entire tree
 #ifndef MAX_LEAVES
@@ -21,6 +21,10 @@
 //! Maximum number of nodes that can be stored in a tree's memory
 #ifndef MEM_SIZE
 #define MEM_SIZE (MAX_NODES_PER_LEVEL * MAX_LEVELS)
+#endif
+//! Maximum number of entries that can be safely inserted
+#ifndef ENTRY_MAX
+#define ENTRY_MAX ((TREE_ORDER/2)+(MAX_LEAVES/2))
 #endif
 
 #if !defined NO_GTEST && !__has_include("gtest/gtest.h")

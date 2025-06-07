@@ -102,7 +102,6 @@ ErrorCode insert(bptr_t *root, bkey_t v, bval_t w, Node *memory) {
 		}
 		A = mem_read(current, memory);
 	}
-	bool leaf = true;
 	
 	/* We have a candidate leaf */
 	mem_lock(current, memory);
@@ -124,10 +123,9 @@ ErrorCode insert(bptr_t *root, bkey_t v, bval_t w, Node *memory) {
 		mem_unlock(current, memory);
 		return SUCCESS;
 	} else {
+		bptr_t level = get_level(current);
 		Node B = empty_node();
-		bptr_t u = leaf ?
-			alloc_node(&B, 0, MAX_LEAVES, memory) :
-			alloc_node(&B, MAX_LEAVES, MEM_SIZE, memory);
+		bptr_t u = alloc_node(level, memory);
 		/* A, B <- rearrange old A, adding v and w, to make 2 nodes,
 		 * where (link ptr of A, linkptr of B) <- (u, linkptr of old A); */
 		/* y <- max value stored in new A; *//* For insertion into parent */
@@ -156,7 +154,7 @@ ErrorCode insert(bptr_t *root, bkey_t v, bval_t w, Node *memory) {
 			// Adjust A for next iteration
 			A = parent;
 			// Reserve a memory slot for the new parent
-			current = alloc_node(&parent, MAX_LEAVES, MEM_SIZE, memory);
+			current = alloc_node(level+1, memory);
 			mem_write(current, &A, memory);
 			*root = current;
 			// Pointer to B will be inserted on next iteration
@@ -171,7 +169,6 @@ ErrorCode insert(bptr_t *root, bkey_t v, bval_t w, Node *memory) {
 			split_key(&A, y, A_addr);
 		}
 		mem_unlock(oldnode, memory);
-		leaf = false;
 		/* And repeat procedure for parent */
 		goto Doinsertion;
 	}

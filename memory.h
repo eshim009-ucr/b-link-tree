@@ -14,7 +14,7 @@ typedef struct AddrNode AddrNode;
 Node mem_read(bptr_t address, Node const *memory);
 
 //! @brief Write a node to memory without touching any locks
-void mem_write(bptr_t address, Node *node, Node *memory);
+void mem_write(bptr_t address, Node const *node, Node *memory);
 
 void mem_lock(bptr_t address, Node *memory);
 
@@ -29,7 +29,7 @@ bool mem_unlock(bptr_t address, Node *memory);
 void mem_unlock(bptr_t address, Node *memory);
 #endif
 
-bptr_t alloc_node(Node *node, bptr_t start, bptr_t end, Node *memory);
+bptr_t alloc_node(bptr_t level, Node *memory);
 
 //! @brief Reset memory to a slate of blank nodes
 //!

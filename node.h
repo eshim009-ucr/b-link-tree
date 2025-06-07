@@ -76,5 +76,18 @@ inline static bptr_t get_level(bptr_t node_ptr) {
 	return (node_ptr / MAX_NODES_PER_LEVEL);
 }
 
+inline static bptr_t level_start(bptr_t level) {
+	return level * MAX_NODES_PER_LEVEL;
+}
+
+inline static bptr_t level_width(bptr_t level) {
+	const bptr_t dist_from_top = MAX_LEVELS-level-1;
+	bptr_t width = 1;
+	for (bptr_t i = 0; i < dist_from_top; ++i) {
+		width *= TREE_ORDER;
+	}
+	return width;
+}
+
 
 #endif

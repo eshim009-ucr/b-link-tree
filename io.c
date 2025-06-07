@@ -62,7 +62,7 @@ void dump_values(FILE *stream, Node const *node) {
 
 void dump_node_list(FILE *stream, Node const *memory) {
 	Node n;
-	uint_fast16_t i, r, c;
+	uint_fast16_t i, r, c, start, width;
 	fprintf(stream, "LEAVES\n%2u ", 0);
 	for (i = 0; i < MAX_LEAVES; ++i) {
 		n = memory[i];
@@ -76,17 +76,21 @@ void dump_node_list(FILE *stream, Node const *memory) {
 	fprintf(stream, "\n");
 	fprintf(stream, "INTERNAL NODES\n");
 	for (r = 1; r < MAX_LEVELS; ++r) {
+		start = level_start(r);
+		width = level_width(r);
 		#pragma GCC diagnostic push
 		#pragma GCC diagnostic ignored "-Wformat"
 		fprintf(stream, "%2u ", r*MAX_NODES_PER_LEVEL);
 		#pragma GCC diagnostic pop
-		for (c = 0; c < MAX_NODES_PER_LEVEL; ++c) {
-			n = memory[r*MAX_NODES_PER_LEVEL + c];
+		for (c = 0; c < width; ++c) {
+			if (start+c >= MEM_SIZE) break;
+			n = memory[start+c];
 			dump_keys(stream, &n);
 		}
 		fprintf(stream, "\n   ");
-		for (c = 0; c < MAX_NODES_PER_LEVEL; ++c) {
-			n = memory[r*MAX_NODES_PER_LEVEL + c];
+		for (c = 0; c < width; ++c) {
+			if (start+c >= MEM_SIZE) break;
+			n = memory[start+c];
 			dump_values(stream, &n);
 		}
 		fprintf(stream, "\n");

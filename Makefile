@@ -32,6 +32,7 @@ docs: $(SRC) $(wildcard *.h) $(wildcard tests/*.hpp)
 clean:
 	rm -rf $(OBJ) $(EXE) $(LIB) $(LOG)
 # Dependencies
+$(OBJ): defs.h types.h
 main.o: main.cpp $(wildcard tests/*.hpp)
 # Manual
 $(EXE): $(LIB) $(filter-out $(OBJ_C),$(OBJ))

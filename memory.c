@@ -23,7 +23,7 @@ Node mem_read(bptr_t address, Node const *memory) {
 	return memory[address];
 }
 
-void mem_write(bptr_t address, Node *node, Node *memory) {
+void mem_write(bptr_t address, Node const *node, Node *memory) {
 	assert(address < MEM_SIZE);
 	memory[address] = *node;
 }
@@ -53,12 +53,12 @@ inline static bool is_free(bptr_t address, Node *memory) {
 	return memory[address].keys[0] == INVALID;
 }
 
-bptr_t alloc_node(Node *node, bptr_t start, bptr_t end, Node *memory) {
+bptr_t alloc_node(bptr_t level, Node *memory) {
+	const bptr_t start = level_start(level);
+	const bptr_t end = start+level_width(level);
 	for (bptr_t i = start; i < end; ++i) {
-		if (is_free(i, memory)) {
-			if (mem_trylock(i, memory)) {
-				return i;
-			}
+		if (is_free(i, memory) && mem_trylock(i, memory)) {
+			return i;
 		}
 	}
 	assert(0);

@@ -115,7 +115,7 @@ TEST(InsertTest, SequentialInsert) {
 	mem_reset_all(memory);
 
 	// Insert values
-	for (uint_fast8_t i = 1; i <= (TREE_ORDER/2)*(MAX_LEAVES+1); ++i) {
+	for (uint_fast8_t i = 1; i <= ENTRY_MAX; ++i) {
 		value.data = -i;
 		ASSERT_EQ(insert(&root, i, value, memory), SUCCESS);
 		dump_node_list(log_stream, memory);
@@ -139,7 +139,7 @@ TEST(InsertTest, SequentialDescendingInsert) {
 	mem_reset_all(memory);
 
 	// Insert values
-	for (uint_fast8_t i = (TREE_ORDER/2)*(MAX_LEAVES+1); i>=1; --i) {
+	for (uint_fast8_t i = ENTRY_MAX; i>=1; --i) {
 		value.data = -i;
 		ASSERT_EQ(insert(&root, i, value, memory), SUCCESS);
 		dump_node_list(log_stream, memory);
