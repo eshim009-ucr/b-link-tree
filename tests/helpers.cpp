@@ -57,7 +57,7 @@ void *stride_insert(void *argv) {
 
 
 bool check_inserted_leaves() {
-	uint_fast8_t next_val = 1;
+	int_fast64_t next_val = 1;
 	AddrNode node = {.addr = 0};
 
 	while (node.addr != INVALID) {

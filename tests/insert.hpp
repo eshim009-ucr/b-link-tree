@@ -115,7 +115,7 @@ TEST(InsertTest, SequentialInsert) {
 	mem_reset_all(memory);
 
 	// Insert values
-	for (uint_fast8_t i = 1; i <= ENTRY_MAX; ++i) {
+	for (uint_fast64_t i = 1; i <= ENTRY_MAX; ++i) {
 		value.data = -i;
 		ASSERT_EQ(insert(&root, i, value, memory), SUCCESS);
 		dump_node_list(log_stream, memory);
