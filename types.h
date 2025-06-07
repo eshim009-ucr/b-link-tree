@@ -8,19 +8,20 @@
 
 //! Datatype of keys
 typedef uint32_t bkey_t;
+#define INVALID ((bkey_t) 0xFFFFFFFFULL)
 //! Datatype of pointers within the tree
-#if MEM_SIZE < (1ULL << 8)
-typedef uint_fast8_t bptr_t;
-#define INVALID ((bkey_t) 0xFF)
-#elif MEM_SIZE < (1ULL << 16)
-typedef uint_fast16_t bptr_t;
-#define INVALID ((bkey_t) 0xFFFF)
-#elif MEM_SIZE < (1ULL << 32)
-typedef uint_fast32_t bptr_t;
-#define INVALID ((bkey_t) 0xFFFFFFFF)
+#if MEM_SIZE < (0xFFULL)
+typedef uint8_t bptr_t;
+#define BAD_PTR ((bptr_t) 0xFF)
+#elif MEM_SIZE < (0xFFFFULL)
+typedef uint16_t bptr_t;
+#define BAD_PTR ((bptr_t) 0xFFFF)
+#elif MEM_SIZE < (0xFFFFFFFFULL)
+typedef uint32_t bptr_t;
+#define BAD_PTR ((bptr_t) 0xFFFFFFFF)
 #elif MEM_SIZE <= (0xFFFFFFFFFFFFFFFFULL)
-typedef uint_fast64_t bptr_t;
-#define INVALID ((bkey_t) 0xFFFFFFFFFFFFFFFF)
+typedef uint64_t bptr_t;
+#define BAD_PTR ((bptr_t) 0xFFFFFFFFFFFFFFFF)
 #else
 #error Address space too big!
 #endif

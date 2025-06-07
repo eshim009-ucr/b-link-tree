@@ -51,7 +51,7 @@ void dump_values(FILE *stream, Node const *node) {
 			fprintf(stream, ", ");
 		}
 	}
-	if (node->next == INVALID) {
+	if (node->next == BAD_PTR) {
 		fprintf(stream, ";    ");
 	} else {
 		fprintf(stream, "; %3u", node->next);
@@ -61,6 +61,8 @@ void dump_values(FILE *stream, Node const *node) {
 
 
 void dump_node_list(FILE *stream, Node const *memory) {
+	const bptr_t STARTS[] = LEVEL_STARTS;
+	const bptr_t WIDTHS[] = LEVEL_WIDTHS;
 	Node n;
 	uint_fast16_t i, r, c, start, width;
 	fprintf(stream, "LEAVES\n%2u ", 0);
@@ -76,8 +78,8 @@ void dump_node_list(FILE *stream, Node const *memory) {
 	fprintf(stream, "\n");
 	fprintf(stream, "INTERNAL NODES\n");
 	for (r = 1; r < MAX_LEVELS; ++r) {
-		start = level_start(r);
-		width = level_width(r);
+		start = STARTS[r];
+		width = WIDTHS[r];
 		#pragma GCC diagnostic push
 		#pragma GCC diagnostic ignored "-Wformat"
 		fprintf(stream, "%2u ", r*MAX_NODES_PER_LEVEL);

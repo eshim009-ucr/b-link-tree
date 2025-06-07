@@ -54,15 +54,16 @@ inline static bool is_free(bptr_t address, Node *memory) {
 }
 
 bptr_t alloc_node(bptr_t level, Node *memory) {
-	const bptr_t start = level_start(level);
-	const bptr_t end = start+level_width(level);
+	const bptr_t STARTS[] = LEVEL_STARTS;
+	const bptr_t start = STARTS[level];
+	const bptr_t end = STARTS[level+1];
 	for (bptr_t i = start; i < end; ++i) {
 		if (is_free(i, memory) && mem_trylock(i, memory)) {
 			return i;
 		}
 	}
 	assert(0);
-	return INVALID;
+	return BAD_PTR;
 }
 
 

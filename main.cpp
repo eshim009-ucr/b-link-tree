@@ -29,8 +29,8 @@ static int run_gtests(int argc, char **argv) {
 
 
 static void on_alloc_fail() {
-	bptr_t tmp = 1000;
-	uint32_t i = 0;
+	uint_fast64_t tmp = 1000;
+	uint_fast8_t i = 0;
 	char prefixes[] = {' ', 'k', 'M', 'G', 'T'};
 	while (tmp-1 < MEM_SIZE) {
 		i++;

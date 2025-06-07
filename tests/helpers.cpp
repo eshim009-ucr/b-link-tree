@@ -60,7 +60,7 @@ bool check_inserted_leaves() {
 	int_fast64_t next_val = 1;
 	AddrNode node = {.addr = 0};
 
-	while (node.addr != INVALID) {
+	while (node.addr != BAD_PTR) {
 		node.node = mem_read(node.addr, memory);
 		for (li_t j = 0; j < TREE_ORDER; ++j) {
 			if (node.node.keys[j] == INVALID) {

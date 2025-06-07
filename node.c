@@ -2,7 +2,7 @@
 
 
 bstatusval_t find_next(Node const *n, bkey_t key) {
-	bstatusval_t result = {SUCCESS, {INVALID}};
+	bstatusval_t result = {.status=SUCCESS, .value.ptr=BAD_PTR};
 	for (li_t i = 0; i < TREE_ORDER; ++i) {
 		// We overshot the node we were looking for
 		// and got an uninitialized key
@@ -26,7 +26,7 @@ bstatusval_t find_next(Node const *n, bkey_t key) {
 		}
 	}
 	// Wasn't in this node, check sibling
-	if (n->next == INVALID) {
+	if (n->next == BAD_PTR) {
 		// Got to the farthest right child,
 		// so the key is greater than any current tree value
 		result.value = n->values[TREE_ORDER-1];
@@ -38,7 +38,7 @@ bstatusval_t find_next(Node const *n, bkey_t key) {
 
 
 bstatusval_t find_value(Node const *n, bkey_t key) {
-	bstatusval_t result = {SUCCESS, {INVALID}};
+	bstatusval_t result = {.status=SUCCESS, .value.ptr=BAD_PTR};
 	for (li_t i = 0; i < TREE_ORDER; ++i) {
 		if (n->keys[i] == key) {
 			result.value = n->values[i];

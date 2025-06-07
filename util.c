@@ -3,7 +3,7 @@
 
 
 bstatusval_t get_value(bkey_t v, Node const *A) {
-	bstatusval_t result = {.status=SUCCESS, .value.ptr=INVALID};
+	bstatusval_t result = {.status=SUCCESS, .value.ptr=BAD_PTR};
 	for (li_t i = 0; i < TREE_ORDER; ++i) {
 		if (A->keys[i] == v) {
 			result.value = A->values[i];
@@ -38,7 +38,7 @@ bool scannode(bkey_t v, Node const *A, bptr_t *result) {
 	* following a child pointer as it would ordinarily do. */
 	// Go down before going left
 	if (A->keys[i-1] < v) {
-		if (A->next == INVALID) {
+		if (A->next == BAD_PTR) {
 			*result = A->values[i-1].ptr;
 			return false;
 		} else {
@@ -55,7 +55,7 @@ Node empty_node() {
 	for (li_t i = 0; i < TREE_ORDER; ++i) {
 		empty.keys[i] = INVALID;
 	}
-	empty.next = INVALID;
+	empty.next = BAD_PTR;
 	empty.lock = LOCK_INIT;
 	return empty;
 }

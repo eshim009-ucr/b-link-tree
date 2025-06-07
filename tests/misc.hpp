@@ -27,7 +27,7 @@ TEST(InitTest, Tree) {
 	for (bptr_t i = 0; i < MEM_SIZE; ++i) {
 		Node n = mem_read(i, memory);
 		for (li_t j = 0; j < TREE_ORDER; ++j) {
-			EXPECT_EQ(n.keys[j], INVALID);
+			ASSERT_EQ(n.keys[j], INVALID);
 		}
 	}
 
