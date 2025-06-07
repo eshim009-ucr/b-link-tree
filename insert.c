@@ -4,7 +4,7 @@
 #include "memory.h"
 
 
-inline static void move_right(bkey_t *t, bkey_t *v, Node *A, bkey_t *current, Node *memory) {
+inline static void move_right(bptr_t *t, bkey_t *v, Node *A, bptr_t *current, Node *memory) {
 	/* Move right if necessary */
 	/* while t <- scannode(v, A) is a link pointer of A do */
 	while (scannode(*v, A, t)) {

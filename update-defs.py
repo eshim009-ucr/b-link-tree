@@ -31,7 +31,6 @@ f"""Usage:
 	print(f"MAX_NODES_PER_LEVEL=MAX_LEAVES")
 	MEM_SIZE = MAX_NODES_PER_LEVEL * MAX_LEVELS
 	print(f"MEM_SIZE={MEM_SIZE}")
-	MEM_SIZE = "(MAX_NODES_PER_LEVEL * MAX_LEVELS)"
 	print(f"ENTRY_MAX={ENTRY_MAX}")
 
 	# Update file in place
@@ -41,13 +40,13 @@ f"""Usage:
 	defs_h_str = sub(r"#\s*define\s+MEM_SIZE\s+.+",
 		f"#define MEM_SIZE {MEM_SIZE}", defs_h_str)
 	defs_h_str = sub(r"#\s*define\s+MAX_LEVELS\s+.+",
-		f"#define MAX_LEVELS {MAX_LEVELS}", defs_h_str)
+		f"#define MAX_LEVELS ((bptr_t) {MAX_LEVELS})", defs_h_str)
 	defs_h_str = sub(r"#\s*define\s+MAX_NODES_PER_LEVEL\s+.+",
-		f"#define MAX_NODES_PER_LEVEL {MAX_NODES_PER_LEVEL}", defs_h_str)
+		f"#define MAX_NODES_PER_LEVEL ((bptr_t) {MAX_NODES_PER_LEVEL})", defs_h_str)
 	defs_h_str = sub(r"#\s*define\s+MAX_LEAVES\s+.+",
-		f"#define MAX_LEAVES {MAX_LEAVES}", defs_h_str)
+		f"#define MAX_LEAVES ((bptr_t) {MAX_LEAVES})", defs_h_str)
 	defs_h_str = sub(r"#\s*define\s+ENTRY_MAX\s+.+",
-		f"#define ENTRY_MAX {ENTRY_MAX}", defs_h_str)
+		f"#define ENTRY_MAX {ENTRY_MAX}UL", defs_h_str)
 	with open("defs.h", "w") as fout:
 		fout.write(defs_h_str)
 	print("Done!")
