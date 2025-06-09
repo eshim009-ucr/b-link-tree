@@ -64,6 +64,8 @@ f"""Usage:
 	print("Updating file...", end="")
 	with open("defs.h", "r") as fin:
 		defs_h_str = fin.read()
+	defs_h_str = sub(r"#\s*define\s+TREE_ORDER\s+.+",
+		f"#define TREE_ORDER {TREE_ORDER}ULL", defs_h_str)
 	defs_h_str = sub(r"#\s*define\s+MEM_SIZE\s+.+",
 		f"#define MEM_SIZE {MEM_SIZE}ULL", defs_h_str)
 	defs_h_str = sub(r"#\s*define\s+MAX_LEVELS\s+.+",
