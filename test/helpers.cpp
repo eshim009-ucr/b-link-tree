@@ -1,10 +1,10 @@
-#include "../defs.h"
+#include "defs.h"
 #ifndef NO_GTEST
 extern "C" {
-#include "../insert.h"
-#include "../io.h"
-#include "../memory.h"
-#include "../node.h"
+#include "insert.h"
+#include "io.h"
+#include "memory.h"
+#include "node.h"
 };
 #include "helpers.hpp"
 #include <assert.h>

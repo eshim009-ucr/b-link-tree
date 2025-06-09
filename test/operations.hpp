@@ -3,7 +3,7 @@
 
 
 extern "C" {
-#include "../operations.h"
+#include "operations.h"
 };
 
 

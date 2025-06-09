@@ -3,11 +3,11 @@
 
 
 extern "C" {
-#include "../insert.h"
-#include "../io.h"
-#include "../memory.h"
-#include "../node.h"
-#include "../validate.h"
+#include "insert.h"
+#include "io.h"
+#include "memory.h"
+#include "node.h"
+#include "validate.h"
 };
 #include "helpers.hpp"
 #include <gtest/gtest.h>

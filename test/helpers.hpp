@@ -2,7 +2,7 @@
 #define TESTS_HELPERS_HPP
 
 
-#include "../types.h"
+#include "types.h"
 #include <cstdio>
 #include <cstring>
 #include <cerrno>

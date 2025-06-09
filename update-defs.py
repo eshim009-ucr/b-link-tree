@@ -62,8 +62,10 @@ f"""Usage:
 
 	# Update file in place
 	print("Updating file...", end="")
-	with open("defs.h", "r") as fin:
+	with open("core/defs.h", "r") as fin:
 		defs_h_str = fin.read()
+	defs_h_str = sub(r"#\s*define\s+TREE_ORDER\s+.+",
+		f"#define TREE_ORDER {TREE_ORDER}ULL", defs_h_str)
 	defs_h_str = sub(r"#\s*define\s+MEM_SIZE\s+.+",
 		f"#define MEM_SIZE {MEM_SIZE}ULL", defs_h_str)
 	defs_h_str = sub(r"#\s*define\s+MAX_LEVELS\s+.+",
@@ -78,7 +80,7 @@ f"""Usage:
 		f"#define LEVEL_STARTS {{{str(LEVEL_STARTS)[1:-1]}}}", defs_h_str)
 	defs_h_str = sub(r"#\s*define\s+LEVEL_WIDTHS\s+.+",
 		f"#define LEVEL_WIDTHS {{{str(LEVEL_WIDTHS)[1:-1]}}}", defs_h_str)
-	with open("defs.h", "w") as fout:
+	with open("core/defs.h", "w") as fout:
 		fout.write(defs_h_str)
 	print("Done!")
 
