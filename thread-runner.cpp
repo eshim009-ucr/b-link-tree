@@ -7,6 +7,7 @@ extern "C" {
 };
 #include <iostream>
 #include <stdint.h>
+#include <chrono>
 
 
 #ifndef VERBOSE
@@ -127,7 +128,7 @@ int run_from_file(int argc, char **argv) {
 		std::copy(memory, memory+MEM_SIZE, memory_vec.begin());
 		std::cout << "Executing..." << std::flush;
 #endif
-		timer = clock();
+		auto start = std::chrono::high_resolution_clock::now();
 #ifndef FPGA
 		for (uint_fast8_t i = last; i < split; ++i) {
 			pthread_create(&threads.at(i), NULL, tree_thread, (void*) &threads_args.at(i));
@@ -135,12 +136,13 @@ int run_from_file(int argc, char **argv) {
 		for (uint_fast8_t i = last; i < split; ++i) {
 			pthread_join(threads.at(i), NULL);
 		}
-		timer = clock() - timer;
+		auto end = std::chrono::high_resolution_clock::now();
 		last = split;
+		double duration_ms = std::chrono::duration_cast<std::chrono::nanoseconds>(end-start).count() / 1000000.0;
 #else
 		run_fpga_tree(requests_vec, responses_vec, memory_vec, std::string(argv[2]));
 #endif
-		std::cout << "\ncompleted in " << (1000.0d * timer/CLOCKS_PER_SEC) << "ms" << std::endl;
+		std::cout << "\ncompleted in " << duration_ms << "ms" << std::endl;
 #ifdef FPGA
 		std::copy(
 			responses_vec.begin(),
