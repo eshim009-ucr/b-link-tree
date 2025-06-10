@@ -45,7 +45,8 @@ int run_from_file(int argc, char **argv) {
 	// Tree data
 	std::vector<std::vector<Request>> reqbufs(argc-2);
 	std::vector<std::vector<Response>> respbufs(argc-2);
-	bptr_t root = 0;
+	const bptr_t LSTARTS[] = LEVEL_STARTS;
+	bptr_t root = LSTARTS[0];
 	// Timing
 	clock_t timer;
 

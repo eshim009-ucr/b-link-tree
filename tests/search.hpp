@@ -23,8 +23,9 @@ TEST(SearchTest, RootIsLeaf) {
 		test_info->test_suite_name(), test_info->name()
 	);
 
+	const bptr_t LSTARTS[] = LEVEL_STARTS;
 	AddrNode root;
-	root.addr = 0;
+	root.addr = LSTARTS[0];
 	mem_reset_all(memory);
 	root.node = mem_read(root.addr, memory);
 	bstatusval_t result;
@@ -65,21 +66,22 @@ TEST(SearchTest, OneInternal) {
 		test_info->test_suite_name(), test_info->name()
 	);
 
+	const bptr_t LSTARTS[] = LEVEL_STARTS;
 	AddrNode root;
-	root.addr = MAX_LEAVES;
+	root.addr = LSTARTS[1];
 	mem_reset_all(memory);
 	root.node = mem_read(root.addr, memory);
-	AddrNode lchild = {.node = mem_read(0, memory), .addr = 0};
-	AddrNode rchild = {.node = mem_read(1, memory), .addr = 1};
+	AddrNode lchild = {.node = mem_read(LSTARTS[0], memory), .addr = LSTARTS[0]+0};
+	AddrNode rchild = {.node = mem_read(LSTARTS[0]+1, memory), .addr = LSTARTS[0]+1};
 	bstatusval_t result;
 
-	root.node.keys[0] = 6; root.node.values[0].ptr = 0;
-	root.node.keys[1] = 12; root.node.values[1].ptr = 1;
+	root.node.keys[0] = 6; root.node.values[0].ptr = lchild.addr;
+	root.node.keys[1] = 12; root.node.values[1].ptr = rchild.addr;
 	lchild.node.keys[0] = 1; lchild.node.values[0].data = -1;
 	lchild.node.keys[1] = 2; lchild.node.values[1].data = -2;
 	lchild.node.keys[2] = 4; lchild.node.values[2].data = -4;
 	lchild.node.keys[3] = 5; lchild.node.values[3].data = -5;
-	lchild.node.next = 1;
+	lchild.node.next = rchild.addr;
 	rchild.node.keys[0] = 7; rchild.node.values[0].data = -7;
 	rchild.node.keys[1] = 8; rchild.node.values[1].data = -8;
 	rchild.node.keys[2] = 10; rchild.node.values[2].data = -10;

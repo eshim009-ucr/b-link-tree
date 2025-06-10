@@ -31,7 +31,8 @@ TEST(ParallelTest, InterleavedAscending) {
 
 	char strbuf[64];
 	pthread_t thread_even, thread_odd;
-	bptr_t root = 0;
+	const bptr_t LSTARTS[] = LEVEL_STARTS;
+	bptr_t root = LSTARTS[0];
 	si_args odd_args = {
 		.start = 1,
 		.end = ENTRY_MAX,
@@ -44,16 +45,19 @@ TEST(ParallelTest, InterleavedAscending) {
 
 	for (uint_fast16_t i = 0; i < PARALLEL_RERUNS; ++i) {
 		fprintf(log_stream, "Run %d\n", i+1);
-		root = 0;
+		const bptr_t LSTARTS[] = LEVEL_STARTS;
+		root = LSTARTS[0];
 		mem_reset_all(memory);
 		sprintf(strbuf, "thread-logs/int-asc_run_%04d_%s.log", i, "odd");
 		TRY_FOPEN(odd_args.log_stream, strbuf, "w");
 		sprintf(strbuf, "thread-logs/int-asc_run_%04d_%s.log", i, "even");
 		TRY_FOPEN(even_args.log_stream, strbuf, "w");
 
+		// stride_insert(&even_args);
+		// stride_insert(&odd_args);
 		pthread_create(&thread_even, NULL, stride_insert, (void*) &even_args);
-		pthread_create(&thread_odd, NULL, stride_insert, (void*) &odd_args);
 		pthread_join(thread_even, NULL);
+		pthread_create(&thread_odd, NULL, stride_insert, (void*) &odd_args);
 		pthread_join(thread_odd, NULL);
 		fclose(odd_args.log_stream);
 		fclose(even_args.log_stream);
@@ -78,7 +82,8 @@ TEST(ParallelTest, InterleavedDescending) {
 
 	char strbuf[64];
 	pthread_t thread_even, thread_odd;
-	bptr_t root = 0;
+	const bptr_t LSTARTS[] = LEVEL_STARTS;
+	bptr_t root = LSTARTS[0];
 	si_args odd_args = {
 		.end = 1,
 		.stride = -2,
@@ -96,7 +101,8 @@ TEST(ParallelTest, InterleavedDescending) {
 
 	for (uint_fast16_t i = 0; i < PARALLEL_RERUNS; ++i) {
 		fprintf(log_stream, "Run %d\n", i+1);
-		root = 0;
+		const bptr_t LSTARTS[] = LEVEL_STARTS;
+		root = LSTARTS[0];
 		mem_reset_all(memory);
 		sprintf(strbuf, "thread-logs/int-des_run_%04d_%s.log", i, "odd");
 		TRY_FOPEN(odd_args.log_stream, strbuf, "w");
@@ -130,7 +136,8 @@ TEST(ParallelTest, CrossfadeInsert) {
 
 	char strbuf[64];
 	pthread_t thread_even, thread_odd;
-	bptr_t root = 0;
+	const bptr_t LSTARTS[] = LEVEL_STARTS;
+	bptr_t root = LSTARTS[0];
 	si_args odd_args = {
 		.start = 1,
 		.end = ENTRY_MAX,
@@ -146,7 +153,7 @@ TEST(ParallelTest, CrossfadeInsert) {
 
 	for (uint_fast16_t i = 0; i < PARALLEL_RERUNS; ++i) {
 		fprintf(log_stream, "Run %d\n", i+1);
-		root = 0;
+		root = LSTARTS[0];
 		mem_reset_all(memory);
 		sprintf(strbuf, "thread-logs/x-fade_run_%04d_%s.log", i, "odd");
 		TRY_FOPEN(odd_args.log_stream, strbuf, "w");

@@ -21,7 +21,8 @@ TEST(InitTest, Tree) {
 		test_info->test_suite_name(), test_info->name()
 	);
 
-	bptr_t root = 0;
+	const bptr_t LSTARTS[] = LEVEL_STARTS;
+	bptr_t root = LSTARTS[0];
 	mem_reset_all(memory);
 
 	for (bptr_t i = 0; i < MEM_SIZE; ++i) {
@@ -43,10 +44,11 @@ TEST(ValidateTest, RootOneChild) {
 	);
 
 	AddrNode root;
-	root.addr = MAX_LEAVES;
+	const bptr_t LSTARTS[] = LEVEL_STARTS;
+	root.addr = LSTARTS[1];
 	mem_reset_all(memory);
 	root.node = mem_read(root.addr, memory);
-	AddrNode lchild = {.node = mem_read(0, memory), .addr = 0};
+	AddrNode lchild = {.node = mem_read(LSTARTS[0], memory), .addr = LSTARTS[0]};
 
 	root.node.keys[0] = 6; root.node.values[0].ptr = 0;
 	lchild.node.keys[0] = 1; lchild.node.values[0].data = -1;

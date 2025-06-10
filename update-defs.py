@@ -38,6 +38,7 @@ f"""Usage:
 	# Generate level boundary LUTs
 	LEVEL_STARTS = [0] * MAX_LEVELS
 	LEVEL_WIDTHS = [0] * MAX_LEVELS
+	LEVEL_STARTS[0] = 1 # Reserve 0 for null pointer
 	LEVEL_WIDTHS[0] = MAX_LEAVES
 	for i in range(1, MAX_LEVELS):
 		LEVEL_WIDTHS[i] = TREE_ORDER ** (MAX_LEVELS-1-i)
@@ -48,6 +49,8 @@ f"""Usage:
 	LEVEL_STARTS.append(MEM_SIZE)
 	if MEM_SIZE.bit_length() > 64:
 		MEM_SIZE = MAX
+	else:
+		MEM_SIZE = MEM_SIZE+1
 	# Display to the user
 	print(f"MAX_LEVELS={MAX_LEVELS} (needs {MAX_LEVELS.bit_length()} bits)")
 	print(f"MAX_LEAVES={MAX_LEAVES}",

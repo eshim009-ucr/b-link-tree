@@ -24,13 +24,14 @@ TEST(InsertTest, LeafNode) {
 		test_info->test_suite_name(), test_info->name()
 	);
 
-	bptr_t root = 0;
+	const bptr_t LSTARTS[] = LEVEL_STARTS;
+	bptr_t root = LSTARTS[0];
 	mem_reset_all(memory);
 	bval_t value;
 
 	value.data = 2;
-	EXPECT_EQ(insert(&root, 0, value, memory), SUCCESS);
-	EXPECT_EQ(mem_read(root, memory).keys[0], 0);
+	EXPECT_EQ(insert(&root, 1, value, memory), SUCCESS);
+	EXPECT_EQ(mem_read(root, memory).keys[0], 1);
 	EXPECT_EQ(mem_read(root, memory).values[0].data, 2);
 	dump_node_list(log_stream, memory);
 	ASSERT_TRUE(is_unlocked(root, log_stream, memory));
@@ -62,18 +63,19 @@ TEST(InsertTest, SplitRoot) {
 		test_info->test_suite_name(), test_info->name()
 	);
 
-	bptr_t root = 0;
+	const bptr_t LSTARTS[] = LEVEL_STARTS;
+	bptr_t root = LSTARTS[0];
 	bptr_t lchild;
 	bval_t value;
 	mem_reset_all(memory);
 
-	value.data = 0;
+	value.data = -1;
 	EXPECT_EQ(insert(&root, -value.data, value, memory), SUCCESS);
 	dump_node_list(log_stream, memory);
 	EXPECT_EQ(mem_read(root, memory).keys[0], -value.data);
 	EXPECT_EQ(mem_read(root, memory).values[0].data, value.data);
 	ASSERT_TRUE(is_unlocked(root, log_stream, memory));
-	value.data = -5;
+	value.data = -2;
 	EXPECT_EQ(insert(&root, -value.data, value, memory), SUCCESS);
 	dump_node_list(log_stream, memory);
 	EXPECT_EQ(mem_read(root, memory).keys[1], -value.data);
@@ -82,20 +84,22 @@ TEST(InsertTest, SplitRoot) {
 	value.data = -3;
 	EXPECT_EQ(insert(&root, -value.data, value, memory), SUCCESS);
 	dump_node_list(log_stream, memory);
-	EXPECT_EQ(mem_read(root, memory).keys[1], -value.data);
-	EXPECT_EQ(mem_read(root, memory).values[1].data, value.data);
-	ASSERT_TRUE(is_unlocked(root, log_stream, memory));
-	// This one causes a split
-	value.data = -1;
-	EXPECT_EQ(insert(&root, -value.data, value, memory), SUCCESS);
-	dump_node_list(log_stream, memory);
-	lchild = mem_read(root, memory).values[0].ptr;
-	EXPECT_EQ(mem_read(lchild, memory).keys[1], -value.data);
-	EXPECT_EQ(mem_read(lchild, memory).values[1].data, value.data);
+	EXPECT_EQ(mem_read(root, memory).keys[2], -value.data);
+	EXPECT_EQ(mem_read(root, memory).values[2].data, value.data);
 	ASSERT_TRUE(is_unlocked(root, log_stream, memory));
 	value.data = -4;
 	EXPECT_EQ(insert(&root, -value.data, value, memory), SUCCESS);
 	dump_node_list(log_stream, memory);
+	EXPECT_EQ(mem_read(root, memory).keys[3], -value.data);
+	EXPECT_EQ(mem_read(root, memory).values[3].data, value.data);
+	ASSERT_TRUE(is_unlocked(root, log_stream, memory));
+	// This one causes a split
+	value.data = -5;
+	EXPECT_EQ(insert(&root, -value.data, value, memory), SUCCESS);
+	dump_node_list(log_stream, memory);
+	lchild = mem_read(root, memory).values[0].ptr;
+	EXPECT_EQ(mem_read(lchild, memory).keys[1], 2);
+	EXPECT_EQ(mem_read(lchild, memory).values[1].data, -2);
 	ASSERT_TRUE(is_unlocked(root, log_stream, memory));
 	ASSERT_TRUE(is_unlocked(lchild, log_stream, memory));
 
@@ -110,7 +114,8 @@ TEST(InsertTest, SequentialInsert) {
 		test_info->test_suite_name(), test_info->name()
 	);
 
-	bptr_t root = 0;
+	const bptr_t LSTARTS[] = LEVEL_STARTS;
+	bptr_t root = LSTARTS[0];
 	bval_t value;
 	mem_reset_all(memory);
 
@@ -134,7 +139,8 @@ TEST(InsertTest, SequentialDescendingInsert) {
 		test_info->test_suite_name(), test_info->name()
 	);
 
-	bptr_t root = 0;
+	const bptr_t LSTARTS[] = LEVEL_STARTS;
+	bptr_t root = LSTARTS[0];
 	bval_t value;
 	mem_reset_all(memory);
 

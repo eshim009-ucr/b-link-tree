@@ -8,23 +8,10 @@
 
 //! Datatype of keys
 typedef uint32_t bkey_t;
-#define INVALID ((bkey_t) 0xFFFFFFFFULL)
+#define INVALID ((bkey_t) 0)
 //! Datatype of pointers within the tree
-#if MEM_SIZE < (0xFFULL)
-typedef uint8_t bptr_t;
-#define BAD_PTR ((bptr_t) 0xFF)
-#elif MEM_SIZE < (0xFFFFULL)
-typedef uint16_t bptr_t;
-#define BAD_PTR ((bptr_t) 0xFFFF)
-#elif MEM_SIZE < (0xFFFFFFFFULL)
-typedef uint32_t bptr_t;
-#define BAD_PTR ((bptr_t) 0xFFFFFFFF)
-#elif MEM_SIZE <= (0xFFFFFFFFFFFFFFFFULL)
 typedef uint64_t bptr_t;
-#define BAD_PTR ((bptr_t) 0xFFFFFFFFFFFFFFFF)
-#else
-#error Address space too big!
-#endif
+#define BAD_PTR ((bptr_t) 0)
 //! Datatype of leaf data
 typedef int32_t bdata_t;
 //! @brief Datatype of node values, which can be either data or pointers within

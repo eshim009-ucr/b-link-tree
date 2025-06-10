@@ -65,13 +65,13 @@ void dump_node_list(FILE *stream, Node const *memory) {
 	const bptr_t WIDTHS[] = LEVEL_WIDTHS;
 	Node n;
 	uint_fast16_t i, r, c, start, width;
-	fprintf(stream, "LEAVES\n%2u ", 0);
-	for (i = 0; i < MAX_LEAVES; ++i) {
+	fprintf(stream, "LEAVES\n%2u ", STARTS[0]);
+	for (i = STARTS[0]; i < STARTS[1]; ++i) {
 		n = memory[i];
 		dump_keys(stream, &n);
 	}
 	fprintf(stream, "\n   ");
-	for (i = 0; i < MAX_LEAVES; ++i) {
+	for (i = STARTS[0]; i < STARTS[1]; ++i) {
 		n = memory[i];
 		dump_values(stream, &n);
 	}
@@ -82,7 +82,7 @@ void dump_node_list(FILE *stream, Node const *memory) {
 		width = WIDTHS[r];
 		#pragma GCC diagnostic push
 		#pragma GCC diagnostic ignored "-Wformat"
-		fprintf(stream, "%2u ", r*MAX_NODES_PER_LEVEL);
+		fprintf(stream, "%2u ", start);
 		#pragma GCC diagnostic pop
 		for (c = 0; c < width; ++c) {
 			if (start+c >= MEM_SIZE) break;

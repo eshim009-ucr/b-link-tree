@@ -23,7 +23,8 @@ TEST(OperationsTest, InsertRandom) {
 	memset(resps, 0, sizeof(Response)*OP_COUNT);
 	mem_reset_all(memory);
 	srand(0);
-	bptr_t root = 0;
+	const bptr_t LSTARTS[] = LEVEL_STARTS;
+	bptr_t root = LSTARTS[0];
 
 	// Generate Requests
 	for (; i < OP_COUNT/2; ++i) {
