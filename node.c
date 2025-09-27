@@ -2,7 +2,7 @@
 
 
 bstatusval_t find_next(Node const *n, bkey_t key) {
-	bstatusval_t result = {.status=SUCCESS, .value.ptr=BAD_PTR};
+	bstatusval_t result = {.status=SUCCESS, .value={.ptr=BAD_PTR}};
 	for (li_t i = 0; i < TREE_ORDER; ++i) {
 		// We overshot the node we were looking for
 		// and got an uninitialized key
@@ -38,7 +38,7 @@ bstatusval_t find_next(Node const *n, bkey_t key) {
 
 
 bstatusval_t find_value(Node const *n, bkey_t key) {
-	bstatusval_t result = {.status=SUCCESS, .value.ptr=BAD_PTR};
+	bstatusval_t result = {.status=SUCCESS, .value={.ptr=BAD_PTR}};
 	for (li_t i = 0; i < TREE_ORDER; ++i) {
 		if (n->keys[i] == key) {
 			result.value = n->values[i];

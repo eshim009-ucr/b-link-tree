@@ -3,7 +3,7 @@
 
 
 bstatusval_t get_value(bkey_t v, Node const *A) {
-	bstatusval_t result = {.status=SUCCESS, .value.ptr=BAD_PTR};
+	bstatusval_t result = {.status=SUCCESS, .value={.ptr=BAD_PTR}};
 	for (li_t i = 0; i < TREE_ORDER; ++i) {
 		if (A->keys[i] == v) {
 			result.value = A->values[i];
