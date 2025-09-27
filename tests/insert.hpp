@@ -2,13 +2,11 @@
 #define TESTS_INSERT_HPP
 
 
-extern "C" {
 #include "../insert.h"
 #include "../io.h"
 #include "../memory.h"
 #include "../node.h"
 #include "../validate.h"
-};
 #include "helpers.hpp"
 #include <gtest/gtest.h>
 #include <pthread.h>

@@ -1,10 +1,8 @@
 #include "loader.hpp"
 #include "thread-runner.hpp"
-extern "C" {
 #include "memory.h"
 #include "node.h"
 #include "operations.h"
-};
 #include <iostream>
 #include <stdint.h>
 

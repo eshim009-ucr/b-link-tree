@@ -2,9 +2,7 @@
 #define TESTS_OPERATIONS_HPP
 
 
-extern "C" {
 #include "../operations.h"
-};
 
 
 TEST(OperationsTest, InsertRandom) {

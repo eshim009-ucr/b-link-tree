@@ -10,7 +10,7 @@ inline static void move_right(bptr_t *t, bkey_t *v, Node *A, bptr_t *current, No
 	while (scannode(*v, A, t)) {
 		/* Note left-to-right locking */
 		mem_lock(*t, memory);
-		mem_unlock(*current, memory); 
+		mem_unlock(*current, memory);
 		*current = *t;
 		*A = mem_read(*current, memory);
 	}
@@ -89,41 +89,41 @@ ErrorCode insert(bptr_t *root, bkey_t v, bval_t w, Node *memory) {
 	bptr_t stack[MAX_LEVELS];
 	bptr_t stack_ptr = 0;
 	bptr_t t;
-	bptr_t current = *root;
-	Node A = mem_read(current, memory);
+	bval_t current = {.ptr = *root};
+	Node A = mem_read(current.ptr, memory);
 
 	/* Scan down tree */
-	while (!is_leaf(current)) {
-		t = current;
-		if (!scannode(v, &A, &current)) {
+	while (!is_leaf(current.ptr)) {
+		t = current.ptr;
+		if (!scannode(v, &A, &current.ptr)) {
 			assert(stack_ptr < MAX_LEVELS);
 			/* Remember node at that level */
 			stack[stack_ptr++] = t;
 		}
-		A = mem_read(current, memory);
+		A = mem_read(current.ptr, memory);
 	}
-	
+
 	/* We have a candidate leaf */
-	mem_lock(current, memory);
-	A = mem_read(current, memory);
-	move_right(&t, &v, &A, &current, memory);
+	mem_lock(current.ptr, memory);
+	A = mem_read(current.ptr, memory);
+	move_right(&t, &v, &A, &current.ptr, memory);
 	/* if v is in A then stop "v already exists in tree"; */
 	/* And t points to its record */
 	bstatusval_t result = get_value(v, &A);
 	if (result.status != NOT_FOUND) {
 		return KEY_EXISTS;
 	}
-	
+
 	Doinsertion:
 	if (is_safe(&A)) {
 		/* Exact manner depends if current is a leaf */
 		node_insert(&A, w, v);
-		mem_write(current, &A, memory);
+		mem_write(current.ptr, &A, memory);
 		/* Success-done backtracking */
-		mem_unlock(current, memory);
+		mem_unlock(current.ptr, memory);
 		return SUCCESS;
 	} else {
-		bptr_t level = get_level(current);
+		bptr_t level = get_level(current.ptr);
 		Node B = empty_node();
 		bptr_t u = alloc_node(level, memory);
 		/* A, B <- rearrange old A, adding v and w, to make 2 nodes,
@@ -140,9 +140,9 @@ ErrorCode insert(bptr_t *root, bkey_t v, bval_t w, Node *memory) {
 		/* Insert B before A */
 		mem_write(u, &B, memory);
 		/* Instantaneous change of 2 nodes */
-		mem_write(current, &A, memory);
+		mem_write(current.ptr, &A, memory);
 		/* Now insert pointer in parent */
-		bptr_t oldnode = current;
+		bptr_t oldnode = current.ptr;
 		v = B_max;
 		w.ptr = u;
 		// Out of parents, need to create a new one
@@ -150,22 +150,22 @@ ErrorCode insert(bptr_t *root, bkey_t v, bval_t w, Node *memory) {
 			// Initialize blank parent
 			Node parent = empty_node();
 			// Insert a pointer to A
-			node_insert(&parent, (bval_t) current, y);
+			node_insert(&parent, current, y);
 			// Adjust A for next iteration
 			A = parent;
 			// Reserve a memory slot for the new parent
-			current = alloc_node(level+1, memory);
-			mem_write(current, &A, memory);
-			*root = current;
+			current.ptr = alloc_node(level+1, memory);
+			mem_write(current.ptr, &A, memory);
+			*root = current.ptr;
 			// Pointer to B will be inserted on next iteration
 		} else {
-			bptr_t A_addr = current;
+			bptr_t A_addr = current.ptr;
 			/* Backtrack */
-			current = stack[--stack_ptr];
+			current.ptr = stack[--stack_ptr];
 			/* Well ordered */
-			mem_lock(current, memory);
-			A = mem_read(current, memory);
-			move_right(&t, &v, &A, &current, memory);
+			mem_lock(current.ptr, memory);
+			A = mem_read(current.ptr, memory);
+			move_right(&t, &v, &A, &current.ptr, memory);
 			split_key(&A, y, A_addr);
 		}
 		mem_unlock(oldnode, memory);

@@ -2,9 +2,7 @@
 #define LOADER_HPP
 
 
-extern "C" {
 #include "operations.h"
-};
 #include <vector>
 
 

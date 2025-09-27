@@ -2,12 +2,10 @@
 #define TESTS_MISC_HPP
 
 
-extern "C" {
 #include "../io.h"
 #include "../memory.h"
 #include "../node.h"
 #include "../validate.h"
-};
 #include <gtest/gtest.h>
 
 extern FILE *log_stream;

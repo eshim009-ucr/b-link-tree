@@ -1,12 +1,12 @@
 ### VARIABLES ###
 # Source Code
-SRC_C=$(wildcard *.c)
-SRC_CPP=$(wildcard *.cpp) $(wildcard tests/*.cpp)
-SRC=$(SRC_C) $(SRC_CPP)
+SRC_LIB=insert.cpp io.cpp memory.cpp node.cpp operations.cpp search.cpp tree-helpers.cpp util.cpp validate.cpp
+SRC_EXE=$(wildcard *.cpp) $(wildcard tests/*.cpp)
+SRC=$(SRC_LIB) $(SRC_EXE)
 # Object Files
-OBJ_C=$(subst .c,.o,$(SRC_C))
-OBJ_CPP=$(subst .cpp,.o,$(SRC_CPP))
-OBJ=$(OBJ_C) $(OBJ_CPP)
+OBJ_LIB=$(subst .cpp,.o,$(SRC_LIB))
+OBJ_EXE=$(subst .cpp,.o,$(SRC_EXE))
+OBJ=$(OBJ_LIB) $(OBJ_EXE)
 # Output Files
 EXE=blink
 LIB=blink.a
@@ -35,7 +35,7 @@ clean:
 $(OBJ): defs.h types.h
 main.o: main.cpp $(wildcard tests/*.hpp)
 # Manual
-$(EXE): $(LIB) $(filter-out $(OBJ_C),$(OBJ))
+$(EXE): $(LIB) $(filter-out $(OBJ_LIB),$(OBJ))
 	$(CXX) -o $@ $^ $(LDFLAGS) $(LDLIBS)
-$(LIB): $(OBJ_C)
-	$(AR) rcvs $@ $(OBJ_C)
+$(LIB): $(OBJ_LIB)
+	$(AR) rcvs $@ $(OBJ_LIB)
