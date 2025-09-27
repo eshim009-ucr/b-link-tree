@@ -2,13 +2,11 @@
 #define TESTS_SEARCH_HPP
 
 
-extern "C" {
 #include "../io.h"
 #include "../memory.h"
 #include "../node.h"
 #include "../search.h"
 #include "../validate.h"
-};
 #include <gtest/gtest.h>
 
 extern FILE *log_stream;

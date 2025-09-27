@@ -2,12 +2,10 @@
 #define TESTS_PARALLEL_HPP
 
 
-extern "C" {
 #include "../io.h"
 #include "../memory.h"
 #include "../node.h"
 #include "../validate.h"
-};
 #include "helpers.hpp"
 #include <gtest/gtest.h>
 
